@@ -1,0 +1,18 @@
+﻿@{
+    ViewData["Title"] = "Privacy Policy";
+}
+<h1>@ViewData["Title"]</h1>
+
+<p>Use this page to detail your site's privacy policy.</p>
+@foreach (var item in Model)
+{
+    <div> Id : @item.Id </div>
+    <div> CarNumber : @item.CarNumber </div>
+    <div> Brand : @item.Brand </div>
+    <div> ModelAvto  : @item.Model </div>
+    <div> ClientID : @item.ClientID </div>
+    <div> DeadLine : @item.DeadLine </div>
+    <div> WorkerID : @item.WorkerID </div>
+    <div> Status : @item.Status </div>
+    <div> Price : @item.Price </div>
+}
