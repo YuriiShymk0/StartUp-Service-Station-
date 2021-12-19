@@ -47,7 +47,38 @@ namespace MyServiceStationProject.Controllers
         {
             var order = GetOrderFromDb();
             return View(order);
+
         }
+        [Authorize]
+        public IActionResult Secured()
+        {
+            return View();
+        }
+
+        [HttpGet("login")]
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost("login")]
+        public IActionResult Validate(string username, string password)
+        {
+            var clientList = GetClientFromDb();
+            foreach (var client in clientList)
+            {
+                if (client.EMail == username && client.Password == password)
+                {
+                    return Ok();
+                }
+                break;
+            }
+            return BadRequest();
+        }
+
+
+
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
