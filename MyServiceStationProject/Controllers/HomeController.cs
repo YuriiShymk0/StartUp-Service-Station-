@@ -56,26 +56,29 @@ namespace MyServiceStationProject.Controllers
         }
 
         [HttpGet("login")]
-        public IActionResult Login()
+        public IActionResult Login(string returnUrl)
         {
+            ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
 
         [HttpPost("login")]
-        public IActionResult Validate(string username, string password)
+        public async Task<IActionResult> Validate(string username, string password, string returnUrl)
         {
-            var clientList = GetClientFromDb();
-            foreach (var client in clientList)
+            var client = GetClientFromDb();
+
+            if (client.EMail == username && client.Password == password)
             {
-                if (client.EMail == username && client.Password == password)
-                {
-                    return Ok();
-                }
-                break;
+                var claims = new List<Claim>();
+                claims.Add(new Claim("username", username));
+                claims.Add(new Claim(ClaimTypes.NameIdentifier, username));
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+                await HttpContext.SignInAsync(claimsPrincipal);
+                return Redirect(returnUrl);
             }
             return BadRequest();
         }
-
 
 
 
@@ -86,12 +89,12 @@ namespace MyServiceStationProject.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        public List<Client> GetClientFromDb(string email = "ddd@ddd.net")
+        public Client GetClientFromDb(string email = "ddd@ddd.net")
         {
             using (IDbConnection db = DbConnection)
             {
                 List<Client> client = db.Query<Client>($"SELECT * FROM Clients WHERE ID = {10000} ").ToList();
-                return client;
+                return client[0];
             }
         }
 
