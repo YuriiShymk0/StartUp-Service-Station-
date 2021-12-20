@@ -1,0 +1,25 @@
+﻿@*
+
+*@
+@{
+    var user = User.Identity.Name;
+    var us = Model;
+}
+@if (User.Identity.IsAuthenticated)
+{
+    <div class="text-center">
+        <h1 class="display-4">Hello @us.FirstName @us.LastName</h1>
+        <p>Wellcome  on site!</p>
+       
+    </div>
+}
+else
+{
+<div class="text-center">
+    <h1 class="display-4">Hello</h1>
+    <p>
+        To log in please press on link
+        <a href="Secured">Log in</a>
+    </p>
+</div>
+}

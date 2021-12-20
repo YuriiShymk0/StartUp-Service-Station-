@@ -43,9 +43,17 @@ namespace MyServiceStationProject.Controllers
             return View();
         }
 
+        public IActionResult Home()
+        {
+            var client = GetClientFromDb();
+            return View(client);
+        }
+
         public IActionResult Privacy()
         {
             var order = GetOrderFromDb();
+            string[] arrclient = {"" };
+            ViewData["order"] = order;
             return View(order);
 
         }
