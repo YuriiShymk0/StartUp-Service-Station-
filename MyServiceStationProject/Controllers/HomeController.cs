@@ -72,6 +72,7 @@ namespace MyServiceStationProject.Controllers
                 var claims = new List<Claim>();
                 claims.Add(new Claim("username", username));
                 claims.Add(new Claim(ClaimTypes.NameIdentifier, username));
+
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
                 await HttpContext.SignInAsync(claimsPrincipal);
@@ -81,6 +82,12 @@ namespace MyServiceStationProject.Controllers
             return View("login");
         }
 
+        [Authorize]
+        public async  Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync();
+            return Redirect("/");
+        }
 
 
 

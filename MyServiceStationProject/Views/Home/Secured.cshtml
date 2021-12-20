@@ -4,3 +4,10 @@
 @{
 }
 <h1>This is top secret</h1>
+<h2>    Welcame @User.Identity.Name</h2>
+<u>
+    @foreach (var item in User.Claims)
+	{
+		 <li>@item.Type: @item.Value</li>		
+	}
+</u>
