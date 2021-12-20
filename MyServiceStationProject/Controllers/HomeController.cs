@@ -66,7 +66,7 @@ namespace MyServiceStationProject.Controllers
         public async Task<IActionResult> Validate(string username, string password, string returnUrl)
         {
             var client = GetClientFromDb();
-
+            ViewData["ReturnUrl"] = returnUrl;
             if (client.EMail == username && client.Password == password)
             {
                 var claims = new List<Claim>();
@@ -77,7 +77,8 @@ namespace MyServiceStationProject.Controllers
                 await HttpContext.SignInAsync(claimsPrincipal);
                 return Redirect(returnUrl);
             }
-            return BadRequest();
+            TempData["Error"] = "Error. Login or password is incorrect!";
+            return View("login");
         }
 
 
