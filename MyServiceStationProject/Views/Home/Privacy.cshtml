@@ -9,19 +9,19 @@
 
 @if (User.Identity.IsAuthenticated)
 {
-    @foreach (var item in Model)
-    {
+    
         <tableRow>
             <tr>
                 <td>
-                    <p>Youe car number : @item.CarNumber </p>
-                    <p>Model of your car: @item.Model
-                    <p>Approximate time to issuence: @item.DeadLine </p>
-                    <p>Id  of your worker :@item.WorkerID</p>
-                    <p>Order status: @item.Status </p>
-                    <p>Approximate price: @item.Price$ </p>
+                    <p>Youe car number : @Model.CarNumber </p>
+                    <p>Brand of your car: @Model.Brand
+                    <p>Model of your car: @Model.Model
+                    <p>Approximate time to issuence: @Model.DeadLine </p>
+                    <p>Id  of your worker :@Model.WorkerID</p>
+                    <p>Order status: @Model.Status </p>
+                    <p>Approximate price: @Model.Price$ </p>
                 </td>
             </tr>
         </tableRow>
-    }
+    
 }

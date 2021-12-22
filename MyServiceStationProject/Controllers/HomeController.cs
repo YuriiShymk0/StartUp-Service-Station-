@@ -43,10 +43,15 @@ namespace MyServiceStationProject.Controllers
             return View();
         }
 
-        public IActionResult Home()
+        
+        public IActionResult Home(string username)
         {
-            var client = GetClientFromDb();
-            return View(client);
+            if (User.Identity.IsAuthenticated)
+            {
+                var client = GetClientFromDb(username);
+                return View(client);
+            }
+            return View();
         }
 
         public IActionResult Privacy()
@@ -70,10 +75,10 @@ namespace MyServiceStationProject.Controllers
             return View();
         }
 
-        [HttpPost("login")]
+        
         public async Task<IActionResult> Validate(string username, string password, string returnUrl)
         {
-            var client = GetClientFromDb();
+            var client = GetClientFromDb(username);
             ViewData["ReturnUrl"] = returnUrl;
             if (client.EMail == username && client.Password == password)
             {
@@ -109,18 +114,25 @@ namespace MyServiceStationProject.Controllers
         {
             using (IDbConnection db = DbConnection)
             {
-                List<Client> client = db.Query<Client>($"SELECT * FROM Clients WHERE ID = {10000} ").ToList();
+                List<Client> client = db.Query<Client>($"select * from Clients where Email = '{ email }' ").ToList();
                 return client[0];
             }
         }
 
-        public List<Order> GetOrderFromDb(int id = 20001)
+        public Order GetOrderFromDb(string email = "ddd@ddd.net")
         {
-            using (IDbConnection db = DbConnection)
+
+            if (User.Identity.IsAuthenticated)
             {
-                List<Order> order = db.Query<Order>($"SELECT * FROM Orders WHERE ID = {id} ").ToList();
-                return order;
+                using (IDbConnection db = DbConnection)
+                {
+                    List<Order> order = db.Query<Order>($"select * from Orders inner join Clients on  Orders.ClientID=(select ClientID from Clients where Email = '{ email }')").ToList();
+
+                    return order[0];
+                }
             }
+            else
+                return new Order();
         }
 
         public List<Worker> GetWorkerFromDb(int id = 30001)
