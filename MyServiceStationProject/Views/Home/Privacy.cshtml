@@ -1,18 +1,27 @@
 ﻿@{
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = "My Car";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
-@foreach (var item in Model)
+<div class="text-center">
+    <h1 class="display-4">@ViewData["Title"]</h1>
+    <p>Information about my car</p>
+</div>
+
+@if (User.Identity.IsAuthenticated)
 {
-    <div> Id : @item.Id </div>
-    <div> CarNumber : @item.CarNumber </div>
-    <div> Brand : @item.Brand </div>
-    <div> ModelAvto  : @item.Model </div>
-    <div> ClientID : @item.ClientID </div>
-    <div> DeadLine : @item.DeadLine </div>
-    <div> WorkerID : @item.WorkerID </div>
-    <div> Status : @item.Status </div>
-    <div> Price : @item.Price </div>
+    
+        <tableRow>
+            <tr>
+                <td>
+                    <p>Youe car number : @Model.CarNumber </p>
+                    <p>Brand of your car: @Model.Brand
+                    <p>Model of your car: @Model.Model
+                    <p>Approximate time to issuence: @Model.DeadLine </p>
+                    <p>Id  of your worker :@Model.WorkerID</p>
+                    <p>Order status: @Model.Status </p>
+                    <p>Approximate price: @Model.Price$ </p>
+                </td>
+            </tr>
+        </tableRow>
+    
 }
