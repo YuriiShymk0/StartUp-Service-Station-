@@ -21,6 +21,8 @@ namespace MyServiceStationProject.Controllers
 {
     public class HomeController : Controller
     {
+        public static string login  = "";
+
         private readonly ILogger<HomeController> _logger;
 
         private readonly IConfiguration _configuration;
@@ -44,23 +46,23 @@ namespace MyServiceStationProject.Controllers
         }
 
         
-        public IActionResult Home(string username)
+        public IActionResult Home()
         {
             if (User.Identity.IsAuthenticated)
             {
-                var client = GetClientFromDb();
+                var client = GetClientFromDb(login);
                 return View(client);
             }
             return View();
         }
-
+        
         public IActionResult Privacy()
         {
-            var order = GetOrderFromDb();
-            string[] arrclient = {"" };
-            ViewData["order"] = order;
-            return View(order);
 
+                var order = GetOrderFromDb(login);
+                string[] arrclient = { "" };
+                ViewData["order"] = order;
+                return View(order);
         }
         [Authorize]
         public IActionResult Secured()
@@ -85,7 +87,7 @@ namespace MyServiceStationProject.Controllers
                 var claims = new List<Claim>();
                 claims.Add(new Claim("username", username));
                 claims.Add(new Claim(ClaimTypes.NameIdentifier, username));
-
+                 login = claims[0].Value;
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
                 await HttpContext.SignInAsync(claimsPrincipal);
