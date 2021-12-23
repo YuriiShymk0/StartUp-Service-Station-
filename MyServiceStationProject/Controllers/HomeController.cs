@@ -48,7 +48,7 @@ namespace MyServiceStationProject.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                var client = GetClientFromDb(username);
+                var client = GetClientFromDb();
                 return View(client);
             }
             return View();
@@ -75,7 +75,7 @@ namespace MyServiceStationProject.Controllers
             return View();
         }
 
-        
+        [HttpPost("login")]
         public async Task<IActionResult> Validate(string username, string password, string returnUrl)
         {
             var client = GetClientFromDb(username);
@@ -121,7 +121,6 @@ namespace MyServiceStationProject.Controllers
 
         public Order GetOrderFromDb(string email = "ddd@ddd.net")
         {
-
             if (User.Identity.IsAuthenticated)
             {
                 using (IDbConnection db = DbConnection)
