@@ -1,0 +1,24 @@
+﻿@{
+    var user = Model;
+}
+@if (User.Identity.IsAuthenticated)
+{
+    <div class="text-center">
+        <h1 class="display-4">Hello @user.FirstName @user.LastName</h1>
+        <p>
+            Wellcome on our site!
+            Here you can find some information about new kind of Service Station
+        </p>
+    </div>
+}
+else
+{
+    <div class="text-center">
+        <h1 class="display-4">Wellcome</h1>
+        <p>
+           Wellcome on our site!
+            Here you can find some information about new kind of Service Station
+
+        </p>
+    </div>
+}
