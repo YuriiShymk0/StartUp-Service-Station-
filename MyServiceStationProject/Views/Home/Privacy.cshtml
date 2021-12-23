@@ -1,25 +1,47 @@
 ﻿@{
-    ViewData["Title"] = "My Car";
+    var order = Model;
 }
-
 <div class="text-center">
-    <h1 class="display-4">@ViewData["Title"]</h1>
-    <p>Information about my car</p>
+    <h1>My Car</h1>
 </div>
 
 @if (User.Identity.IsAuthenticated)
 {
-    <tableRow>
-        <tr>
-            <td>
-                <p>Youe car number : @Model.CarNumber </p>
-                <p>Brand of your car: @Model.Brand
-                <p>Model of your car: @Model.Model
-                <p>Approximate time to issuence: @Model.DeadLine </p>
-                <p>Id  of your worker :@Model.WorkerID</p>
-                <p>Order status: @Model.Status </p>
-                <p>Approximate price: @Model.Price$ </p>
-            </td>
-        </tr>
-    </tableRow>
+    if (order.Status != null)
+    {
+        <div class="text-center">
+            <h1 class="display-4">@ViewData["Title"]</h1>
+            <p>Information about my car</p>
+        </div>
+        <tableRow>
+            <tr>
+                <td>
+                    <p>Youe car number : @order.CarNumber </p>
+                    <p>Brand of your car: @order.Brand
+                    <p>Model of your car: @order.Model
+                    <p>Approximate time to issuence: @order.DeadLine </p>
+                    <p>Id  of your worker :@order.WorkerID</p>
+                    <p>Order status: @order.Status </p>
+                    <p>Approximate price: @order.Price$ </p>
+                </td>
+            </tr>
+        </tableRow>
+    }
+    else
+    {
+        <div class="text-center">
+            <p>You dont have any orders to repair of your car</p>
+        </div>
+
+    }
 }
+else
+{
+    <div class="text-center">
+        <p>Here will be information about the repair status of your car</p>
+    </div>
+}
+
+
+
+

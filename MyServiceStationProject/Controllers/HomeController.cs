@@ -21,8 +21,6 @@ namespace MyServiceStationProject.Controllers
 {
     public class HomeController : Controller
     {
-        public static string login = "";
-
         private readonly ILogger<HomeController> _logger;
 
         private readonly IConfiguration _configuration;
@@ -42,6 +40,12 @@ namespace MyServiceStationProject.Controllers
         }
         public IActionResult Index()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                string login = User.Claims.FirstOrDefault(c => c.Type == "username").Value;
+                var client = GetClientFromDb(login);
+                return View(client);
+            }
             return View();
         }
 
@@ -50,19 +54,24 @@ namespace MyServiceStationProject.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
+                string login = User.Claims.FirstOrDefault(c => c.Type == "username").Value;
                 var client = GetClientFromDb(login);
                 return View(client);
             }
             return View();
         }
-         
+
 
         public IActionResult Privacy()
         {
-            var order = GetOrderFromDb(login);
-            string[] arrclient = { "" };
-            ViewData["order"] = order;
-            return View(order);
+            if (User.Identity.IsAuthenticated)
+            {
+                string login = User.Claims.FirstOrDefault(c => c.Type == "username").Value;
+                var order = GetOrderFromDb(login);
+                //ViewData["order"] = order;
+                return View(order);
+            }
+            return View();
         }
         [Authorize]
         public IActionResult Secured()
@@ -78,7 +87,6 @@ namespace MyServiceStationProject.Controllers
         [HttpGet("login")]
         public IActionResult Login(string returnUrl)
         {
-
             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
@@ -87,17 +95,15 @@ namespace MyServiceStationProject.Controllers
         public async Task<IActionResult> Validate(string username, string password, string returnUrl)
         {
             var client = GetClientFromDb(username);
-            ViewData["ReturnUrl"] = returnUrl;
             if (client.EMail == username && client.Password == password)
             {
                 var claims = new List<Claim>();
                 claims.Add(new Claim("username", username));
                 claims.Add(new Claim(ClaimTypes.NameIdentifier, username));
-                login = claims[0].Value;
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
                 await HttpContext.SignInAsync(claimsPrincipal);
-                return Redirect(returnUrl);
+                return Redirect("/");
             }
             TempData["Error"] = "Error. Login or password is incorrect!";
             return View("login");
@@ -113,8 +119,13 @@ namespace MyServiceStationProject.Controllers
         [HttpPost("registration")]
         public IActionResult Registration(string firstName, string lastName, string email, string phone, string password, string confirmPassword)
         {
-            PutClientIntoDb(firstName, lastName, phone, email, password);
-            return Redirect("/");
+            if (firstName != null && lastName != null && email != null && phone != null && password != null && confirmPassword != null )
+            {
+                PutClientIntoDb(firstName, lastName, phone, email, password);
+                return Redirect("/");
+            }
+            TempData["Error"] = "Error. Field can`t be empty!";
+            return View("SignUp");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -128,7 +139,7 @@ namespace MyServiceStationProject.Controllers
             using (IDbConnection db = DbConnection)
             {
                 List<Client> client = db.Query<Client>($"select * from Clients where Email = '{ email }' ").ToList();
-                return client[0];
+                return client.Count != 0 ? client[0] : new Client();
             }
         }
 
@@ -142,7 +153,6 @@ namespace MyServiceStationProject.Controllers
         }
 
         public Order GetOrderFromDb(string email = "ddd@ddd.net")
-
         {
             if (User.Identity.IsAuthenticated)
             {
@@ -150,8 +160,7 @@ namespace MyServiceStationProject.Controllers
                 {
                     List<Client> clientID = db.Query<Client>($"select ID from Clients where Email = '{ email }' ").ToList();
                     List<Order> order = db.Query<Order>($"select * from Orders where ClientID = '{ clientID[0].Id }'").ToList();
-
-                    return order[0];
+                    return order.Count != 0 ? order[0] : new Order();
                 }
             }
             else
