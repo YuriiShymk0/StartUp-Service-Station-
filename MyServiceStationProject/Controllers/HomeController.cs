@@ -11,8 +11,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using System.Collections.Generic;
-using System.Collections;
 using System.Threading.Tasks;
 using MyServiceStationProject.Models;
 using MyServiceStation.Controllers;
@@ -21,6 +19,7 @@ namespace MyServiceStationProject.Controllers
 {
     public class HomeController : Controller
     {
+
         private readonly ILogger<HomeController> _logger;
 
         private readonly IConfiguration _configuration;
@@ -44,11 +43,10 @@ namespace MyServiceStationProject.Controllers
             {
                 string login = User.Claims.FirstOrDefault(c => c.Type == "username").Value;
                 var client = GetClientFromDb(login);
-                return View(client);
+                return View(client[0]);
             }
             return View();
         }
-
 
         public IActionResult Home()
         {
@@ -56,7 +54,7 @@ namespace MyServiceStationProject.Controllers
             {
                 string login = User.Claims.FirstOrDefault(c => c.Type == "username").Value;
                 var client = GetClientFromDb(login);
-                return View(client);
+                return View(client[0]);
             }
             return View();
         }
@@ -68,18 +66,39 @@ namespace MyServiceStationProject.Controllers
             {
                 string login = User.Claims.FirstOrDefault(c => c.Type == "username").Value;
                 var order = GetOrderFromDb(login);
-                //ViewData["order"] = order;
-                return View(order);
+                ViewData["order"] = order;
+                return View(order[0]);
             }
             return View();
+
         }
-        [Authorize]
-        public IActionResult Secured()
+
+        public IActionResult SignUp()
         {
             return View();
         }
 
-        public IActionResult SignUp()
+        [Authorize]
+        public IActionResult OrdersList()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                string login = User.Claims.FirstOrDefault(c => c.Type == "username").Value;
+                var order = GetOrderFromDb(login);
+                ViewData["order"] = order;
+                return View(order);
+            }
+            return Redirect("/");
+        }
+
+        [Authorize]
+        public IActionResult CreateOrder()
+        {
+            return View();
+        }
+
+        [Authorize]
+        public IActionResult ManageOrder()
         {
             return View();
         }
@@ -91,22 +110,54 @@ namespace MyServiceStationProject.Controllers
             return View();
         }
 
+
         [HttpPost("login")]
         public async Task<IActionResult> Validate(string username, string password, string returnUrl)
         {
             var client = GetClientFromDb(username);
-            if (client.EMail == username && client.Password == password)
+            if (client.Count != 0)
             {
-                var claims = new List<Claim>();
-                claims.Add(new Claim("username", username));
-                claims.Add(new Claim(ClaimTypes.NameIdentifier, username));
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-                await HttpContext.SignInAsync(claimsPrincipal);
-                return Redirect("/");
+                ViewData["ReturnUrl"] = returnUrl;
+                if (client[0].EMail == username && client[0].Password == password)
+                {
+                    var claims = new List<Claim>();
+                    claims.Add(new Claim("username", username));
+                    claims.Add(new Claim(ClaimTypes.NameIdentifier, username));
+                    claims.Add(new Claim(ClaimTypes.Role, "User"));
+                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+                    await HttpContext.SignInAsync(claimsPrincipal);
+                    return Redirect("/");
+                }
+                TempData["Error"] = "Error. Login or password is incorrect!";
+                return View("login");
             }
-            TempData["Error"] = "Error. Login or password is incorrect!";
-            return View("login");
+            else
+            {
+                var worker = GetWorkerFromDb(username);
+                if (worker.Count != 0)
+                {
+                    ViewData["ReturnUrl"] = returnUrl;
+                    if (worker[0].EMail == username && worker[0].Password == password)
+                    {
+                        var claims = new List<Claim>();
+                        claims.Add(new Claim("username", username));
+                        claims.Add(new Claim(ClaimTypes.NameIdentifier, username));
+                        claims.Add(new Claim(ClaimTypes.Role, "Admin"));
+                        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                        var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+                        await HttpContext.SignInAsync(claimsPrincipal);
+                        return Redirect("/");
+                    }
+                    TempData["Error"] = "Error. Login or password is incorrect!";
+                    return View("login");
+                }
+                else
+                {
+                    TempData["Error"] = "Error. Login or password is incorrect!";
+                    return View("login");
+                }
+            }
         }
 
         [Authorize]
@@ -116,17 +167,7 @@ namespace MyServiceStationProject.Controllers
             return Redirect("/");
         }
 
-        [HttpPost("registration")]
-        public IActionResult Registration(string firstName, string lastName, string email, string phone, string password, string confirmPassword)
-        {
-            if (firstName != null && lastName != null && email != null && phone != null && password != null && confirmPassword != null )
-            {
-                PutClientIntoDb(firstName, lastName, phone, email, password);
-                return Redirect("/");
-            }
-            TempData["Error"] = "Error. Field can`t be empty!";
-            return View("SignUp");
-        }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
@@ -134,25 +175,21 @@ namespace MyServiceStationProject.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        public Client GetClientFromDb(string email = "ddd@ddd.net")
+        public List<Client> GetClientFromDb(string email = "ddd@ddd.net")
         {
-            using (IDbConnection db = DbConnection)
+            if (email != null)
             {
-                List<Client> client = db.Query<Client>($"select * from Clients where Email = '{ email }' ").ToList();
-                return client.Count != 0 ? client[0] : new Client();
+                using (IDbConnection db = DbConnection)
+                {
+                    List<Client> client = db.Query<Client>($"select * from Clients where Email = '{ email }' ").ToList();
+                    return client;
+                }
             }
+            else
+                return new List<Client>();
         }
 
-
-        public void PutClientIntoDb(string firstName, string lastName, string phone, string email, string password)
-        {
-            using (IDbConnection db = DbConnection)
-            {
-                db.Query($"INSERT INTO Clients (FirstName, LastName, Phone, Email, Password) VALUES ('{firstName}','{lastName}','{phone}','{email}','{password}')");
-            }
-        }
-
-        public Order GetOrderFromDb(string email = "ddd@ddd.net")
+        public List<Order> GetOrderFromDb(string email = "ddd@ddd.net")
         {
             if (User.Identity.IsAuthenticated)
             {
@@ -160,20 +197,25 @@ namespace MyServiceStationProject.Controllers
                 {
                     List<Client> clientID = db.Query<Client>($"select ID from Clients where Email = '{ email }' ").ToList();
                     List<Order> order = db.Query<Order>($"select * from Orders where ClientID = '{ clientID[0].Id }'").ToList();
-                    return order.Count != 0 ? order[0] : new Order();
+                    return order.Count != 0 ? order : new List<Order>();
                 }
             }
             else
-                return new Order();
+                return new List<Order>();
         }
 
-        public List<Worker> GetWorkerFromDb(int id = 30001)
+        public List<Worker> GetWorkerFromDb(string email) //add correct query
         {
-            using (IDbConnection db = DbConnection)
+            if (email != null)
             {
-                List<Worker> worker = db.Query<Worker>($"SELECT * FROM Workers WHERE ID = {id} ").ToList();
-                return worker;
+                using (IDbConnection db = DbConnection)
+                {
+                    List<Worker> worker = db.Query<Worker>($"SELECT * FROM Workers WHERE EMail = '{ email }' AND Admin = 'True' ").ToList();
+                    return worker;
+                }
             }
+            else
+                return new List<Worker>();
         }
     }
 }
