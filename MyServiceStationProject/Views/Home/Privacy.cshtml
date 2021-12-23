@@ -9,19 +9,17 @@
 
 @if (User.Identity.IsAuthenticated)
 {
-    
-        <tableRow>
-            <tr>
-                <td>
-                    <p>Youe car number : @Model.CarNumber </p>
-                    <p>Brand of your car: @Model.Brand
-                    <p>Model of your car: @Model.Model
-                    <p>Approximate time to issuence: @Model.DeadLine </p>
-                    <p>Id  of your worker :@Model.WorkerID</p>
-                    <p>Order status: @Model.Status </p>
-                    <p>Approximate price: @Model.Price$ </p>
-                </td>
-            </tr>
-        </tableRow>
-    
+    <tableRow>
+        <tr>
+            <td>
+                <p>Youe car number : @Model.CarNumber </p>
+                <p>Brand of your car: @Model.Brand
+                <p>Model of your car: @Model.Model
+                <p>Approximate time to issuence: @Model.DeadLine </p>
+                <p>Id  of your worker :@Model.WorkerID</p>
+                <p>Order status: @Model.Status </p>
+                <p>Approximate price: @Model.Price$ </p>
+            </td>
+        </tr>
+    </tableRow>
 }

@@ -9,7 +9,16 @@
 }
 <h1>Login Page</h1>
 <form action="/login?ReturnUrl=@System.Net.WebUtility.UrlEncode(returnUrl)" method="post">
-    <input type="text" name="username" value="Username" />
-    <input type="password" name="password" value="Password" />
-    <input type="submit" value="login" />
+    <table>
+        <tr>
+            <td>
+                <p><input type="text" name="username" placeholder="Username" /></p>
+                <p><input type="password" name="password" placeholder="Password" /></p>
+                <div class="text-center">
+                    <p><input type="submit" value="login" /></p>
+                </div>
+            </td>
+        </tr>
+    </table>
+
 </form>
