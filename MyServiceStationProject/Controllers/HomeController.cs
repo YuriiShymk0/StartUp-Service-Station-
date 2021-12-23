@@ -19,6 +19,7 @@ namespace MyServiceStationProject.Controllers
 {
     public class HomeController : Controller
     {
+        
         private readonly ILogger<HomeController> _logger;
 
         private readonly IConfiguration _configuration;
@@ -38,32 +39,38 @@ namespace MyServiceStationProject.Controllers
         }
         public IActionResult Index()
         {
-            return View();
-        }
-
-        
-        public IActionResult Home(string username)
-        {
             if (User.Identity.IsAuthenticated)
             {
-                var client = GetClientFromDb();
-                return View(client);
+                string login = User.Claims.FirstOrDefault(c => c.Type == "username").Value;
+                var client = GetClientFromDb(login);
+                return View(client[0]);
             }
             return View();
         }
 
-        public IActionResult Privacy(string username)
+        public IActionResult Home()
         {
-            var order = GetOrderFromDb();
-            string[] arrclient = {"" };
-            ViewData["order"] = order;
-            return View(order);
-
-        }
-        [Authorize]
-        public IActionResult Secured()
-        {
+            if (User.Identity.IsAuthenticated)
+            {
+                string login = User.Claims.FirstOrDefault(c => c.Type == "username").Value;
+                var client = GetClientFromDb(login);
+                return View(client[0]);
+            }
             return View();
+        }
+
+
+        public IActionResult Privacy()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                string login = User.Claims.FirstOrDefault(c => c.Type == "username").Value;
+                var order = GetOrderFromDb(login);
+                ViewData["order"] = order;
+                return View(order[0]);
+            }
+            return View();
+
         }
 
         public IActionResult SignUp()
@@ -72,11 +79,12 @@ namespace MyServiceStationProject.Controllers
         }
 
         [Authorize]
-        public IActionResult OrdersList(string username)
+        public IActionResult OrdersList()
         {
             if (User.Identity.IsAuthenticated)
             {
-                var order = GetOrderFromDb();
+                string login = User.Claims.FirstOrDefault(c => c.Type == "username").Value;
+                var order = GetOrderFromDb(login);
                 ViewData["order"] = order;
                 return View(order);
             }
@@ -102,6 +110,7 @@ namespace MyServiceStationProject.Controllers
             return View();
         }
 
+
         [HttpPost("login")]
         public async Task<IActionResult> Validate(string username, string password, string returnUrl)
         {
@@ -118,7 +127,7 @@ namespace MyServiceStationProject.Controllers
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
                     await HttpContext.SignInAsync(claimsPrincipal);
-                    return Redirect(returnUrl);
+                    return Redirect("/");
                 }
                 TempData["Error"] = "Error. Login or password is incorrect!";
                 return View("login");
@@ -138,7 +147,7 @@ namespace MyServiceStationProject.Controllers
                         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                         var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
                         await HttpContext.SignInAsync(claimsPrincipal);
-                        return Redirect(returnUrl);
+                        return Redirect("/");
                     }
                     TempData["Error"] = "Error. Login or password is incorrect!";
                     return View("login");
@@ -152,18 +161,13 @@ namespace MyServiceStationProject.Controllers
         }
 
         [Authorize]
-        public async  Task<IActionResult> Logout()
+        public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync();
             return Redirect("/");
         }
 
-        [HttpPost("registration")]
-        public IActionResult Registration(string firstName, string lastName, string email, string phone, string password, string confirmPassword)
-        {
-            PutClientIntoDb(firstName, lastName, phone, email, password);
-            return Redirect("/");
-        }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
@@ -173,44 +177,45 @@ namespace MyServiceStationProject.Controllers
 
         public List<Client> GetClientFromDb(string email = "ddd@ddd.net")
         {
-            using (IDbConnection db = DbConnection)
+            if (email != null)
             {
-                List<Client> client = db.Query<Client>($"select * from Clients where Email = '{ email }' ").ToList();
-                return client;
+                using (IDbConnection db = DbConnection)
+                {
+                    List<Client> client = db.Query<Client>($"select * from Clients where Email = '{ email }' ").ToList();
+                    return client;
+                }
             }
-        }
-
-        public void PutClientIntoDb(string firstName, string lastName, string phone, string email, string password)
-        {
-            using (IDbConnection db = DbConnection)
-            {
-                db.Query($"INSERT INTO Clients (FirstName, LastName, Phone, Email, Password) VALUES ('{firstName}','{lastName}','{phone}','{email}','{password}')");
-            }
+            else
+                return new List<Client>();
         }
 
         public List<Order> GetOrderFromDb(string email = "ddd@ddd.net")
         {
-
             if (User.Identity.IsAuthenticated)
             {
                 using (IDbConnection db = DbConnection)
                 {
-                    List<Order> order = db.Query<Order>($"select * from Orders inner join Clients on  Orders.ClientID=(select ClientID from Clients where Email = '{ email }')").ToList();
-
-                    return order;
+                    List<Client> clientID = db.Query<Client>($"select ID from Clients where Email = '{ email }' ").ToList();
+                    List<Order> order = db.Query<Order>($"select * from Orders where ClientID = '{ clientID[0].Id }'").ToList();
+                    return order.Count != 0 ? order : new List<Order>();
                 }
             }
             else
                 return new List<Order>();
         }
 
-        public List<Worker> GetWorkerFromDb(string email)
+        public List<Worker>GetWorkerFromDb(string email) //add correct query
         {
-            using (IDbConnection db = DbConnection)
+            if (email != null)
             {
-                List<Worker> worker = db.Query<Worker>($"SELECT * FROM Workers WHERE EMail = '{ email }' AND Admin = 'True' ").ToList();
-                return worker;
+                using (IDbConnection db = DbConnection)
+                {
+                    List<Worker> worker = db.Query<Worker>($"SELECT * FROM Workers WHERE EMail = '{ email }' AND Admin = 'True' ").ToList();
+                    return worker;
+                }
             }
+            else
+                return new List<Worker>();
         }
     }
 }
