@@ -1,0 +1,22 @@
+﻿@{
+   ViewData["Title"] = "My Car";
+}
+
+
+<div class="container text-center">
+    <div class="flex-md-grow-1">
+        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="ManageOrder">Edit</a>
+    </div>
+</div>
+<div class="container text-center">
+    <div class="flex-md-grow-1">
+        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="CreateOrder">New Order</a>
+    </div>
+</div>
+<div class="align-items-md-end border-info">
+    <h2>@Model[0].CarNumber</h2>
+    <p>@Model[0].Brand</p>
+    <p>@Model[0].Model</p>
+    <span class="align-self-md-end">@Model[0].Status</span>
+</div>
+
