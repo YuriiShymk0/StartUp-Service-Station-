@@ -55,6 +55,7 @@ namespace MyServiceStationProject.Controllers
             }
             return View();
         }
+         
 
         public IActionResult Privacy()
         {
