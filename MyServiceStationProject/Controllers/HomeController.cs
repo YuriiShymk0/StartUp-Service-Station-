@@ -70,6 +70,11 @@ namespace MyServiceStationProject.Controllers
             return View();
         }
 
+        public IActionResult SignUp()
+        {
+            return View();
+        }
+
         [HttpGet("login")]
         public IActionResult Login(string returnUrl)
         {
@@ -105,7 +110,12 @@ namespace MyServiceStationProject.Controllers
             return Redirect("/");
         }
 
-
+        [HttpPost("registration")]
+        public IActionResult Registration(string firstName, string lastName, string email, string phone, string password, string confirmPassword)
+        {
+            PutClientIntoDb(firstName, lastName, phone, email, password);
+            return Redirect("/");
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
@@ -122,7 +132,17 @@ namespace MyServiceStationProject.Controllers
             }
         }
 
-        public Order GetOrderFromDb(string email )
+
+        public void PutClientIntoDb(string firstName, string lastName, string phone, string email, string password)
+        {
+            using (IDbConnection db = DbConnection)
+            {
+                db.Query($"INSERT INTO Clients (FirstName, LastName, Phone, Email, Password) VALUES ('{firstName}','{lastName}','{phone}','{email}','{password}')");
+            }
+        }
+
+        public Order GetOrderFromDb(string email = "ddd@ddd.net")
+
         {
             if (User.Identity.IsAuthenticated)
             {
