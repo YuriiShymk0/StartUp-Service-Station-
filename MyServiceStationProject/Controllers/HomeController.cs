@@ -21,7 +21,7 @@ namespace MyServiceStationProject.Controllers
 {
     public class HomeController : Controller
     {
-        public static string login  = "";
+        public static string login = "";
 
         private readonly ILogger<HomeController> _logger;
 
@@ -45,7 +45,7 @@ namespace MyServiceStationProject.Controllers
             return View();
         }
 
-        
+
         public IActionResult Home()
         {
             if (User.Identity.IsAuthenticated)
@@ -55,14 +55,13 @@ namespace MyServiceStationProject.Controllers
             }
             return View();
         }
-        
+
         public IActionResult Privacy()
         {
-
-                var order = GetOrderFromDb(login);
-                string[] arrclient = { "" };
-                ViewData["order"] = order;
-                return View(order);
+            var order = GetOrderFromDb(login);
+            string[] arrclient = { "" };
+            ViewData["order"] = order;
+            return View(order);
         }
         [Authorize]
         public IActionResult Secured()
@@ -73,6 +72,7 @@ namespace MyServiceStationProject.Controllers
         [HttpGet("login")]
         public IActionResult Login(string returnUrl)
         {
+
             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
@@ -87,7 +87,7 @@ namespace MyServiceStationProject.Controllers
                 var claims = new List<Claim>();
                 claims.Add(new Claim("username", username));
                 claims.Add(new Claim(ClaimTypes.NameIdentifier, username));
-                 login = claims[0].Value;
+                login = claims[0].Value;
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
                 await HttpContext.SignInAsync(claimsPrincipal);
@@ -98,7 +98,7 @@ namespace MyServiceStationProject.Controllers
         }
 
         [Authorize]
-        public async  Task<IActionResult> Logout()
+        public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync();
             return Redirect("/");
@@ -121,13 +121,14 @@ namespace MyServiceStationProject.Controllers
             }
         }
 
-        public Order GetOrderFromDb(string email = "ddd@ddd.net")
+        public Order GetOrderFromDb(string email )
         {
             if (User.Identity.IsAuthenticated)
             {
                 using (IDbConnection db = DbConnection)
                 {
-                    List<Order> order = db.Query<Order>($"select * from Orders inner join Clients on  Orders.ClientID=(select ClientID from Clients where Email = '{ email }')").ToList();
+                    List<Client> clientID = db.Query<Client>($"select ID from Clients where Email = '{ email }' ").ToList();
+                    List<Order> order = db.Query<Order>($"select * from Orders where ClientID = '{ clientID[0].Id }'").ToList();
 
                     return order[0];
                 }
