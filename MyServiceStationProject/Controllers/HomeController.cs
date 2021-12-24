@@ -143,7 +143,7 @@ namespace MyServiceStationProject.Controllers
             if (client.Count != 0)
             {
                 ViewData["ReturnUrl"] = returnUrl;
-                if (client[0].EMail == username && client[0].Password == password)
+                if (client[0].EMail == username || client[0].Phone == username && client[0].Password == password)
                 {
                     var claims = new List<Claim>();
                     claims.Add(new Claim("username", username));
@@ -200,13 +200,13 @@ namespace MyServiceStationProject.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        public List<Client> GetClientFromDb(string email)
+        public List<Client> GetClientFromDb(string userLogin)
         {
-            if (email != null)
+            if (userLogin != null)
             {
                 using (IDbConnection db = DbConnection)
                 {
-                    List<Client> clients = db.Query<Client>($"select * from Clients where Email = '{ email }' ").ToList();
+                    List<Client> clients = db.Query<Client>($"select * from Clients where Email = '{ userLogin }' OR Phone = '{ userLogin }' ").ToList();
                     return clients;
                 }
             }
