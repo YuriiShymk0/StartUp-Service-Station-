@@ -1,0 +1,26 @@
+﻿
+@{ ViewData["Title"] = "My Car"; var orders = Model; }
+
+<div class="text-center">
+    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="ManageOrder">Edit</a>
+    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="CreateOrder">New Order</a>
+</div>
+
+@foreach (var item in orders)
+{
+    <div class="card col-lg-5 my-3 py-3 px-3 margin-card">
+        <tableRow>
+            <tr>
+                <td>
+                    <p>Car number : @item.CarNumber </p>
+                    <p>Brand of  car: @item.Brand
+                    <p>Model of  car: @item.Model
+                    <p>Approximate time to issuence: @item.DeadLine </p>
+                    <p>Id of your worker :@item.WorkerID</p>
+                    <p>Order status: @item.Status </p>
+                    <p>Approximate price: @item.Price$ </p>
+                </td>
+            </tr>
+        </tableRow>
+    </div>
+}

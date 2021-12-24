@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
+
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
@@ -21,13 +22,21 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Home">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">My Car</a>
-                        </li>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            var role = User.Claims.ToList()[2].Value;
+                            if (role == "User")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">My Car</a>
+                                </li>
+                            }
+                        } 
+
                         @if (!User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Secured">Log in</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Login">Log in</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="SignUp">Sign Up</a>
@@ -36,6 +45,14 @@
 
                         @if (User.Identity.IsAuthenticated)
                         {
+
+                            var role = User.Claims.ToList()[2].Value;
+                            if (role == "Admin")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="OrdersList">Active Orders</a>
+                                </li>
+                            }
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Logout">Logout</a>
                             </li>
@@ -53,7 +70,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2021 - MyServiceStationProject 
+            &copy; 2021 - MyServiceStationProject
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
