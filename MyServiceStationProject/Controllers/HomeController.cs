@@ -91,7 +91,7 @@ namespace MyServiceStationProject.Controllers
             return View();
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public IActionResult OrdersList()
         {
             if (User.Identity.IsAuthenticated)
@@ -104,13 +104,13 @@ namespace MyServiceStationProject.Controllers
             return Redirect("/");
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public IActionResult CreateOrder()
         {
             return View();
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public IActionResult ManageOrder()
         {
             return View();
@@ -121,6 +121,18 @@ namespace MyServiceStationProject.Controllers
         {
             ViewData["ReturnUrl"] = returnUrl;
             return View();
+        }
+
+        [HttpPost("registration")]
+        public IActionResult Registration(string firstName, string lastName, string email, string phone, string password, string confirmPassword)
+        {
+            if (firstName != null && lastName != null && email != null && phone != null && password != null && confirmPassword != null)
+            {
+                PutClientIntoDb(firstName, lastName, phone, email, password);
+                return Redirect("/");
+            }
+            TempData["Error"] = "Error. Field can`t be empty!";
+            return View("SignUp");
         }
 
 
@@ -242,6 +254,14 @@ namespace MyServiceStationProject.Controllers
             }
             else
                 return new List<Worker>();
+        }
+
+        public void PutClientIntoDb(string firstName, string lastName, string phone, string email, string password)
+        {
+            using (IDbConnection db = DbConnection)
+            {
+                db.Query($"INSERT INTO Clients (FirstName, LastName, Phone, Email, Password) VALUES ('{firstName}','{lastName}','{phone}','{email}','{password}')");
+            }
         }
     }
 }
