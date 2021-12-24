@@ -1,5 +1,5 @@
 ﻿@{
-    var order = Model;
+    var orders = Model;
 }
 <div class="text-center">
     <h1>My Car</h1>
@@ -7,25 +7,29 @@
 
 @if (User.Identity.IsAuthenticated)
 {
-    if (order.Status != null)
+    if (orders.Count != 0)
     {
         <div class="text-center">
             <h1 class="display-4">@ViewData["Title"]</h1>
             <p>Information about my car</p>
         </div>
-        <tableRow>
-            <tr>
-                <td>
-                    <p>Youe car number : @order.CarNumber </p>
-                    <p>Brand of your car: @order.Brand
-                    <p>Model of your car: @order.Model
-                    <p>Approximate time to issuence: @order.DeadLine </p>
-                    <p>Id  of your worker :@order.WorkerID</p>
-                    <p>Order status: @order.Status </p>
-                    <p>Approximate price: @order.Price$ </p>
-                </td>
-            </tr>
-        </tableRow>
+        foreach (var item in orders)
+        {
+            <tableRow>
+                <tr>
+                    <td>
+                        <p>Youe car number : @item.CarNumber </p>
+                        <p>Brand of your car: @item.Brand
+                        <p>Model of your car: @item.Model
+                        <p>Approximate time to issuence: @item.DeadLine </p>
+                        <p>Id  of your worker :@item.WorkerID</p>
+                        <p>Order status: @item.Status </p>
+                        <p>Approximate price: @item.Price$ </p>
+                    </td>
+                </tr>
+            </tableRow>
+        }
+
     }
     else
     {

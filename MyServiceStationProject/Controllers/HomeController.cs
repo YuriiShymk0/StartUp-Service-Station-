@@ -43,7 +43,12 @@ namespace MyServiceStationProject.Controllers
             {
                 string login = User.Claims.FirstOrDefault(c => c.Type == "username").Value;
                 var client = GetClientFromDb(login);
-                return View(client[0]);
+                if (client.Count == 0)
+                {
+                    var worker = GetWorkerFromDb(login);
+                    return View(worker);
+                }
+                return View(client);
             }
             return View();
         }
@@ -54,7 +59,11 @@ namespace MyServiceStationProject.Controllers
             {
                 string login = User.Claims.FirstOrDefault(c => c.Type == "username").Value;
                 var client = GetClientFromDb(login);
-                return View(client[0]);
+                if (client.Count == 0)
+                {
+                    var worker = GetWorkerFromDb(login);
+                    return View(worker[0]);
+                }
             }
             return View();
         }
@@ -65,9 +74,9 @@ namespace MyServiceStationProject.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 string login = User.Claims.FirstOrDefault(c => c.Type == "username").Value;
-                var order = GetOrderFromDb(login);
+                var order = GetClientOrderFromDb(login);
                 ViewData["order"] = order;
-                return View(order[0]);
+                return View(order);
             }
             return View();
 
@@ -84,7 +93,7 @@ namespace MyServiceStationProject.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 string login = User.Claims.FirstOrDefault(c => c.Type == "username").Value;
-                var order = GetOrderFromDb(login);
+                var order = GetAllOrdersFromDb();
                 ViewData["order"] = order;
                 return View(order);
             }
@@ -175,21 +184,21 @@ namespace MyServiceStationProject.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        public List<Client> GetClientFromDb(string email = "ddd@ddd.net")
+        public List<Client> GetClientFromDb(string email)
         {
             if (email != null)
             {
                 using (IDbConnection db = DbConnection)
                 {
-                    List<Client> client = db.Query<Client>($"select * from Clients where Email = '{ email }' ").ToList();
-                    return client;
+                    List<Client> clients = db.Query<Client>($"select * from Clients where Email = '{ email }' ").ToList();
+                    return clients;
                 }
             }
             else
                 return new List<Client>();
         }
 
-        public List<Order> GetOrderFromDb(string email = "ddd@ddd.net")
+        public List<Order> GetClientOrderFromDb(string email = "ddd@ddd.net")
         {
             if (User.Identity.IsAuthenticated)
             {
@@ -197,6 +206,19 @@ namespace MyServiceStationProject.Controllers
                 {
                     List<Client> clientID = db.Query<Client>($"select ID from Clients where Email = '{ email }' ").ToList();
                     List<Order> order = db.Query<Order>($"select * from Orders where ClientID = '{ clientID[0].Id }'").ToList();
+                    return order.Count != 0 ? order : new List<Order>();
+                }
+            }
+            else
+                return new List<Order>();
+        }
+        public List<Order> GetAllOrdersFromDb()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                using (IDbConnection db = DbConnection)
+                {
+                    List<Order> order = db.Query<Order>($"select * from Orders ").ToList();
                     return order.Count != 0 ? order : new List<Order>();
                 }
             }
