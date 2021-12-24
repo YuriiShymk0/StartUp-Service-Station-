@@ -64,6 +64,10 @@ namespace MyServiceStationProject.Controllers
                     var worker = GetWorkerFromDb(login);
                     return View(worker[0]);
                 }
+                else
+                {
+                    return View(client[0]);
+                }
             }
             return View();
         }

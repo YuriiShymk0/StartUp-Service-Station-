@@ -1,45 +1,26 @@
-﻿<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"
-      @{ ViewData["Title"] = "My Car"; var orders = Model; }
+﻿
+@{ ViewData["Title"] = "My Car"; var orders = Model; }
 
-
-
-<div class="container text-center">
-    <div class="flex-md-grow-1">
-        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="ManageOrder">Edit</a>
-    </div>
+<div class="text-center">
+    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="ManageOrder">Edit</a>
+    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="CreateOrder">New Order</a>
 </div>
-<div class="container text-center">
-    <div class="flex-md-grow-1">
-        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="CreateOrder">New Order</a>
-    </div>
-</div>
+
 @foreach (var item in orders)
 {
-    @*<tableRow>
-        <tr>
-            <td>
-                <p>Youe car number : @item.CarNumber </p>
-                <p>Brand of your car: @item.Brand
-                <p>Model of your car: @item.Model
-                <p>Approximate time to issuence: @item.DeadLine </p>
-                <p>Id  of your worker :@item.WorkerID</p>
-                <p>Order status: @item.Status </p>
-                <p>Approximate price: @item.Price$ </p>
-            </td>
-        </tr>
-    </tableRow>*@
-
-
-<div class="card col-lg-5 my-3 py-3 px-3 margin-card">
-    <div class="row">
-        <div class="col-lg-6 px-4">
-            <h4 class="">User  @item <span class="ml-3"></h4>
-            
-        </div>
-        <div class="col-lg-6 px-4">
-            <h4>From @item.Brand</h4>
-        
-        </div>
+    <div class="card col-lg-5 my-3 py-3 px-3 margin-card">
+        <tableRow>
+            <tr>
+                <td>
+                    <p>Car number : @item.CarNumber </p>
+                    <p>Brand of  car: @item.Brand
+                    <p>Model of  car: @item.Model
+                    <p>Approximate time to issuence: @item.DeadLine </p>
+                    <p>Id of your worker :@item.WorkerID</p>
+                    <p>Order status: @item.Status </p>
+                    <p>Approximate price: @item.Price$ </p>
+                </td>
+            </tr>
+        </tableRow>
     </div>
-</div>
 }

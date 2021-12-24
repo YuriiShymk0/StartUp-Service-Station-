@@ -15,19 +15,21 @@
         </div>
         foreach (var item in orders)
         {
-            <tableRow>
-                <tr>
-                    <td>
-                        <p>Youe car number : @item.CarNumber </p>
-                        <p>Brand of your car: @item.Brand
-                        <p>Model of your car: @item.Model
-                        <p>Approximate time to issuence: @item.DeadLine </p>
-                        <p>Id  of your worker :@item.WorkerID</p>
-                        <p>Order status: @item.Status </p>
-                        <p>Approximate price: @item.Price$ </p>
-                    </td>
-                </tr>
-            </tableRow>
+            <div class="card col-lg-5 my-3 py-3 px-3 margin-card">
+                <tableRow>
+                    <tr>
+                        <td>
+                            <p>Youe car number : @item.CarNumber </p>
+                            <p>Brand of your car: @item.Brand
+                            <p>Model of your car: @item.Model
+                            <p>Approximate time to issuence: @item.DeadLine </p>
+                            <p>Id  of your worker :@item.WorkerID</p>
+                            <p>Order status: @item.Status </p>
+                            <p>Approximate price: @item.Price$ </p>
+                        </td>
+                    </tr>
+                </tableRow>
+            </div>
         }
 
     }
