@@ -286,9 +286,12 @@ namespace MyServiceStationProject.Controllers
 
         public void CreateNewOrder(string CarNumber, string Brand, string Model, int ClientID, int WorkerID, string Status, DateTime Dedline, int Price)
         {
+            var mounth = Dedline.Month;
+            var day = Dedline.Day;
+            var year = Dedline.Year;
             using (IDbConnection db = DbConnection)
             {
-                db.Query($"INSERT INTO Orders (CarNumber, Brand, Model, ClientID, WorkerID, Status, Deadline, Price) VALUES ('{ CarNumber }','{ Brand }','{ Model }','{ ClientID }','{ WorkerID }','{ Status }','{ Dedline }','{ Price }')");
+                db.Query($"INSERT INTO Orders (CarNumber, Brand, Model, ClientID, WorkerID, Status, Deadline, Price) VALUES ('{ CarNumber }','{ Brand }','{ Model }','{ ClientID }','{ WorkerID }','{ Status }','{$"{mounth}.{day}.{year}" }','{ Price }')");
             }
         }
     }
