@@ -1,7 +1,18 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
 }
 
-<h1>А тут нет нихуя yet</h1>
+<div class="text-center">
+    <h1>Please enter the field to Add new Order</h1>
+
+    <form action="/addorder" method="post">
+        <p><input type="text" name="CarNumber" placeholder="CarNumber" /></p>
+        <p><input type="text" name="Brand" placeholder="Brand" /></p>
+        <p><input type="text" name="Model" placeholder="Model" /></p>
+        <p><input type="text" name="ClientID" placeholder="ClientID" /></p>
+        <p><input type="text" name="WorkerID" placeholder="WorkerID" /></p>
+        <p><input type="text" name="Status" placeholder="Status" /></p>
+        <p><input type="text" name="Deadline" placeholder="Deadline" /></p>
+        <p><input type="text" name="Price" placeholder="Price" /></p>
+        <p><input type="submit" value="CreateOrder" /></p>
+    </form>
+</div>

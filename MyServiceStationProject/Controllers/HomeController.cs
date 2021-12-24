@@ -1,25 +1,25 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Dapper;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics;
-using Dapper;
-using Microsoft.Data.SqlClient;
-using System.Data;
-using System.Linq;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using System.Threading.Tasks;
-using MyServiceStationProject.Models;
 using MyServiceStation.Controllers;
+using MyServiceStationProject.Models;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace MyServiceStationProject.Controllers
 {
     public class HomeController : Controller
     {
-
         private readonly ILogger<HomeController> _logger;
 
         private readonly IConfiguration _configuration;
@@ -103,12 +103,31 @@ namespace MyServiceStationProject.Controllers
             }
             return Redirect("/");
         }
+        //[Authorize(Roles = "Admin")]
+        //public IActionResult CreateOrder()
+        //{
+        //    return View();
+        //}
+
+
+        [HttpPost("addorder")]
+        public IActionResult AddOrder(string CarNumber, string Brand, string Model, int ClientID, int WorkerID, string Status, DateTime Deadline, int Price)
+        {
+            if (CarNumber != null && Brand != null && Model != null && Status != null && Deadline != default && Price != 0)
+            {
+                CreateNewOrder(CarNumber, Brand, Model, ClientID, WorkerID, Status, Deadline, Price);
+                return Redirect("/Home/OrdersList");
+            }
+            TempData["Error"] = "Error. Field can`t be empty!";
+            return View("/Home/CreateOrder");
+        }
 
         [Authorize(Roles = "Admin")]
         public IActionResult CreateOrder()
         {
             return View();
         }
+
 
         [Authorize(Roles = "Admin")]
         public IActionResult ManageOrder()
@@ -128,8 +147,11 @@ namespace MyServiceStationProject.Controllers
         {
             if (firstName != null && lastName != null && email != null && phone != null && password != null && confirmPassword != null)
             {
-                PutClientIntoDb(firstName, lastName, phone, email, password);
-                return Redirect("/");
+                if (password == confirmPassword)
+                {
+                    PutClientIntoDb(firstName, lastName, phone, email, password);
+                    return Redirect("/");
+                }
             }
             TempData["Error"] = "Error. Field can`t be empty!";
             return View("SignUp");
@@ -191,8 +213,6 @@ namespace MyServiceStationProject.Controllers
             await HttpContext.SignOutAsync();
             return Redirect("/");
         }
-
-
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
@@ -261,6 +281,14 @@ namespace MyServiceStationProject.Controllers
             using (IDbConnection db = DbConnection)
             {
                 db.Query($"INSERT INTO Clients (FirstName, LastName, Phone, Email, Password) VALUES ('{firstName}','{lastName}','{phone}','{email}','{password}')");
+            }
+        }
+
+        public void CreateNewOrder(string CarNumber, string Brand, string Model, int ClientID, int WorkerID, string Status, DateTime Dedline, int Price)
+        {
+            using (IDbConnection db = DbConnection)
+            {
+                db.Query($"INSERT INTO Orders (CarNumber, Brand, Model, ClientID, WorkerID, Status, Deadline, Price) VALUES ('{ CarNumber }','{ Brand }','{ Model }','{ ClientID }','{ WorkerID }','{ Status }','{ Dedline }','{ Price }')");
             }
         }
     }
