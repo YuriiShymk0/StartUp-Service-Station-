@@ -2,6 +2,12 @@
 @{
     ViewData["Title"] = "My Car";
     var item = Model;
+    var error = TempData["Error"] as string;
+}
+@if (!string.IsNullOrEmpty(error))
+{<div class="text-center">
+        <h2 class="alert-danger" style="padding:20px;">@error</h2>
+    </div>
 }
 
 <div class="card col-lg-5 my-3 py-3 px-3 margin-card">
@@ -10,12 +16,12 @@
             <td>
                 <form action="/UpdateOrder" method="post">
                     <p><input type="hidden" name="orderID" value="@item.Id" /></p>
-                    <p>Car number :</p><input type="text" name="carNumber" value="@item.CarNumber" />
-                    <p>Brand of  car:</p><input type="text" name="brand" value="@item.Brand" />
-                    <p>Model of  car:</p><input type="text" name="model" value="@item.Model" />
-                    <p>Approximate time to issuence:</p><input type="text" name="deadline" value="@item.DeadLine" />
-                    <p>Approximate price:</p><input type="number" name="price" value="@item.Price" />
-                    <p><input type="submit" name="" value="UpdateOrder"/></p>
+                    <p class="">Car number :</p><input type="text" name="carNumber" value="@item.CarNumber" />
+                    <p class="">Brand of  car:</p><input type="text" name="brand" value="@item.Brand" />
+                    <p class="">Model of  car:</p><input type="text" name="model" value="@item.Model" />
+                    <p class="">Approximate time to issuence:</p><input type="text" name="deadline" value="@item.DeadLine" />
+                    <p class="">Approximate price:</p><input type="number" name="price" value="@item.Price" />
+                    <p><input type="submit" name="" value="UpdateOrder" /></p>
                 </form>
             </td>
         </tr>

@@ -165,8 +165,14 @@ namespace MyServiceStationProject.Controllers
         [HttpPost("UpdateOrder")]
         public IActionResult UpdateOrder(int orderID, string carNumber, string brand, string model, string deadline, int price)
         {
-            UpdateCarInDB(orderID, carNumber, brand, model, deadline, price);
-            return Redirect("/Home/OrdersList");
+            if (orderID != 0 && carNumber != null && brand != null && model != null && deadline != default && price != 0)
+            {
+                UpdateCarInDB(orderID, carNumber, brand, model, deadline, price);
+                return Redirect("/Home/OrdersList");
+            }
+            TempData["Error"] = "Error. Field can`t be empty!";
+            var order = DbConnection.Query<Order>($"select * from Orders where ID = '{ orderID }' AND Status != 'Done'").ToList();
+            return View("ManageOrder", order[0]);
         }
 
         [HttpGet("login")]
