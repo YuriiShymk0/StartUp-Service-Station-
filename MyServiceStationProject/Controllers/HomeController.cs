@@ -204,7 +204,15 @@ namespace MyServiceStationProject.Controllers
         public IActionResult SearchResult(string adminQuery)
         {
             List<Order> searchResult = SearchingForOrders(adminQuery);
-            return View("OrdersList", searchResult);
+            if (searchResult.Count != 0)
+            {
+                return View("OrdersList", searchResult);
+
+            }
+            else {
+                TempData["Error"] = "Nothing to see here :^(!";
+                return View("OrdersList",searchResult);
+            }
         }
 
         [HttpGet("login")]
@@ -346,8 +354,12 @@ namespace MyServiceStationProject.Controllers
                         if (order.Count == 0)
                         {
                             List<Client> clientID = db.Query<Client>($"select ID from Clients where Phone = '{ searchQuery }' ").ToList();
-                            List<Order> postSearch = db.Query<Order>($"select * from Orders where ClientID = '{ clientID[0].Id }'").ToList();
-                            return postSearch.Count != 0 ? postSearch : new List<Order>();
+                            if (clientID.Count != 0)
+                            {
+                                List<Order> postSearch = db.Query<Order>($"select * from Orders where ClientID = '{ clientID[0].Id }'").ToList();
+                                return postSearch.Count != 0 ? postSearch : new List<Order>();
+                            }else
+                                return new List<Order>();
                             //List<Order> daClient = db.Query<Order>($"select * from Clients where Phone = '{ searchQuery }' OR FirstName = '{ searchQuery }' OR LastName = '{ searchQuery }' OR Model = '{ searchQuery }'").ToList();
                             //int i = 0;
                             //List<Order> filterArray = new List<Order>;
