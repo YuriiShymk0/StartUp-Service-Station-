@@ -1,5 +1,6 @@
 ﻿@{
     var orders = Model;
+    var workers = TempData["worker"] as List<MyServiceStation.Controllers.Worker>;
 }
 <div class="text-center">
     <h1>My Car</h1>
@@ -13,32 +14,31 @@
             <h1 class="display-4">@ViewData["Title"]</h1>
             <p>Information about my car</p>
         </div>
-        foreach (var item in orders)
+        for (int i = 0; i < orders.Count; i++)
         {
             <div class="card col-lg-5 my-3 py-3 px-3 margin-card">
                 <tableRow>
                     <tr>
                         <td>
-                            <p>Youe car number : @item.CarNumber </p>
-                            <p>Brand of your car: @item.Brand
-                            <p>Model of your car: @item.Model
-                            <p>Approximate time to issuence: @item.DeadLine </p>
-                            <p>Id  of your worker :@item.WorkerID</p>
-                            <p>Order status: @item.Status </p>
-                            <p>Approximate price: @item.Price$ </p>
+                            <p>Youe car number : @orders[i].CarNumber </p>
+                            <p>Brand of your car: @orders[i].Brand
+                            <p>Model of your car: @orders[i].Model
+                            <p>Approximate time to issuence: @orders[i].DeadLine </p>
+                            <p>Order status: @orders[i].Status </p>
+                            <p>Approximate price: @orders[i].Price$ </p>
+                            <p></p>
+                            <p>Your worker :@workers[i].FirstName @workers[i].LastName </p>
                         </td>
                     </tr>
                 </tableRow>
             </div>
         }
-
     }
     else
     {
         <div class="text-center">
             <p>You dont have any orders to repair of your car</p>
         </div>
-
     }
 }
 else
