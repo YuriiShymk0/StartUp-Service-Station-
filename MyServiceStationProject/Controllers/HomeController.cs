@@ -159,6 +159,7 @@ namespace MyServiceStationProject.Controllers
             return View();
         }
 
+
         //redacted
         [HttpPost("ManageOrder")]
         public IActionResult ManageOrder(string carNumber)
@@ -169,9 +170,9 @@ namespace MyServiceStationProject.Controllers
 
         //redacted
         [HttpPost("UpdateOrder")]
-        public IActionResult UpdateOrder(string carNumber, string brand, string model, string deadline, int price)
+        public IActionResult UpdateOrder(int orderID, string carNumber, string brand, string model, string deadline, int price)
         {
-            UpdateCarInDB(carNumber, brand, model, deadline, price);
+            UpdateCarInDB(orderID, carNumber, brand, model, deadline, price);
             return Redirect("/Home/OrdersList");
         }
 
@@ -254,8 +255,6 @@ namespace MyServiceStationProject.Controllers
             return Redirect("/");
         }
 
-        
-
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
@@ -334,13 +333,13 @@ namespace MyServiceStationProject.Controllers
                 return new List<Order>();
         }
 
-        public void UpdateCarInDB(string carNumber, string brand, string model, string deadline, int price) //add correct query
+        public void UpdateCarInDB(int id, string carNumber, string brand, string model, string deadline, int price) //add correct query
         {
             if (carNumber != null)
             {
                 using (IDbConnection db = DbConnection)
                 {
-                    List<Order> order = db.Query<Order>($"UPDATE Orders SET CarNumber = '{ carNumber }', Brand = '{ brand }', Model = '{ model }', Deadline = '{ deadline }', Price = '{ (int)price }'; ").ToList();
+                    List<Order> order = db.Query<Order>($"UPDATE Orders SET CarNumber = '{ carNumber }', Brand = '{ brand }', Model = '{ model }', Deadline = '{ deadline }', Price = '{ (int)price }' WHERE ID = '{ id }'; ").ToList();
                 }
             }
         }
@@ -360,7 +359,7 @@ namespace MyServiceStationProject.Controllers
             var year = Dedline.Year;
             using (IDbConnection db = DbConnection)
             {
-                db.Query($"INSERT INTO Orders (CarNumber, Brand, Model, ClientID, WorkerID, Status, Deadline, Price) VALUES ('{ CarNumber }','{ Brand }','{ Model }','{ ClientID }','{ WorkerID }','{ Status }','{$"{mounth}.{day}.{year}" }','{ Price }')");
+                db.Query($"INSERT INTO Orders (CarNumber, Brand, Model, ClientID, WorkerID, Status, Deadline, Price) VALUES ('{ CarNumber }','{ Brand }','{ Model }','{ ClientID }','{ WorkerID }','{ Status }','{$"{mounth}.{day}.{year}" }','{ Price }') ");
             }
         }
     }
