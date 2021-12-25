@@ -10,7 +10,6 @@ using MyServiceStation.Controllers;
 using MyServiceStationProject.Models;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
@@ -31,13 +30,8 @@ namespace MyServiceStationProject.Controllers
             _configuration = configuration;
         }
 
-        public IDbConnection DbConnection
-        {
-            get
-            {
-                return new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-            }
-        }
+        public IDbConnection DbConnection => new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+
         public IActionResult Index()
         {
             if (User.Identity.IsAuthenticated)
@@ -95,10 +89,7 @@ namespace MyServiceStationProject.Controllers
             return View();
         }
 
-        public IActionResult SignUp()
-        {
-            return View();
-        }
+        public IActionResult SignUp() => View();
 
         [Authorize(Roles = "Admin")]
         public IActionResult OrdersList()
@@ -116,44 +107,38 @@ namespace MyServiceStationProject.Controllers
         [HttpPost("addorder")]
         public IActionResult AddOrder(string CarNumber, string Brand, string Model, string PhoneNumber, int WorkerID, DateTime Deadline, int Price)
         {
-            int check = 0 ;
-            if (CarNumber != null && Brand != null && Model != null &&  Deadline != default && Price != 0)
+            int check = 0;
+            if (CarNumber != null && Brand != null && Model != null && Deadline != default && Price != 0)
             {
                 var user = GetClientFromDb(PhoneNumber);
                 if (user.Count != 0)
                 {
                     CreateNewOrder(CarNumber, Brand, Model, user[0].Id, WorkerID, "Idle", Deadline, Price);
                 }
-                else 
+                else
                 {
                     PutClientIntoDb("FirstName", "LastName", PhoneNumber, "email", "password");
-                    var usr =GetClientFromDb(PhoneNumber);
+                    var usr = GetClientFromDb(PhoneNumber);
                     CreateNewOrder(CarNumber, Brand, Model, usr[0].Id, WorkerID, "Idle", Deadline, Price);
                 }
                 TempData["Success"] = "Order was successuly created!";
                 return View("CreateOrder");
             }
-            else if(check == 0)
+            else if (check == 0)
             {
                 TempData["Error"] = "Error. Field can`t be empty!";
                 return View("CreateOrder");
             }
             else
             {
-                 check++;
+                check++;
                 return View("CreateOrder");
             }
-           
         }
 
         [Authorize(Roles = "Admin")]
-        public IActionResult CreateOrder()
-        {
-            return View();
-        }
+        public IActionResult CreateOrder() => View();
 
-
-        //redacted
         [HttpPost("ManageOrder")]
         public IActionResult ManageOrder(string carNumber)
         {
@@ -190,7 +175,6 @@ namespace MyServiceStationProject.Controllers
             TempData["Error"] = "Error. Field can`t be empty!";
             return View("SignUp");
         }
-
 
         [HttpPost("login")]
         public async Task<IActionResult> Validate(string username, string password, string returnUrl)
@@ -248,6 +232,8 @@ namespace MyServiceStationProject.Controllers
             return Redirect("/");
         }
 
+
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
@@ -267,7 +253,7 @@ namespace MyServiceStationProject.Controllers
             else
                 return new List<Client>();
         }
-       
+
         public List<Order> GetClientOrdersFromDb(string email)
         {
             if (User.Identity.IsAuthenticated)
@@ -297,7 +283,7 @@ namespace MyServiceStationProject.Controllers
                 return new List<Order>();
         }
 
-        public List<Worker> GetWorkerFromDb(string email) //add correct query
+        public List<Worker> GetWorkerFromDb(string email) 
         {
             if (email != null)
             {
@@ -310,7 +296,8 @@ namespace MyServiceStationProject.Controllers
             else
                 return new List<Worker>();
         }
-        public Worker GetWorkerNameFromDb(int workerId) //add correct query
+
+        public Worker GetWorkerNameFromDb(int workerId)
         {
             if (workerId != 0)
             {
@@ -325,8 +312,8 @@ namespace MyServiceStationProject.Controllers
         }
 
 
-        //redacted
-        public List<Order> GetCarFromDb(string carNumber) //add correct query
+        
+        public List<Order> GetCarFromDb(string carNumber)
         {
             if (carNumber != null)
             {
