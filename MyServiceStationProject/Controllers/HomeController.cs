@@ -10,7 +10,6 @@ using MyServiceStation.Controllers;
 using MyServiceStationProject.Models;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
@@ -21,6 +20,9 @@ namespace MyServiceStationProject.Controllers
 {
     public class HomeController : Controller
     {
+
+        public string[] Statuses = { "Idle", "Done", "Ready", "In Work" };
+
         private readonly ILogger<HomeController> _logger;
 
         private readonly IConfiguration _configuration;
@@ -31,13 +33,8 @@ namespace MyServiceStationProject.Controllers
             _configuration = configuration;
         }
 
-        public IDbConnection DbConnection
-        {
-            get
-            {
-                return new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-            }
-        }
+        public IDbConnection DbConnection => new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+
         public IActionResult Index()
         {
             if (User.Identity.IsAuthenticated)
@@ -54,6 +51,30 @@ namespace MyServiceStationProject.Controllers
             return View();
         }
 
+        
+        public IActionResult UserProfile()
+        {
+            string login = User.Claims.FirstOrDefault(c => c.Type == "username").Value;
+            var client = GetClientFromDb(login);
+            return View(client[0]);
+        }
+
+        [HttpPost("ChangeUser")]
+        public IActionResult ChangeUser(string firstName, string lastName, string phone, string email, string password)
+        {
+            UpdateUser(firstName, lastName, phone, email, password);
+            return Redirect("/Home/UserProfile");
+        }
+        public void UpdateUser(string firstName, string lastName, string phone, string email, string password)
+        {
+            if (email != null)
+            {
+                using (IDbConnection db = DbConnection)
+                {
+                    List<Order> order = db.Query<Order>($"UPDATE Clients SET FirstName = '{firstName}', LastName = '{ lastName }', Phone = '{ phone }', Email = '{ email }', Password = '{ password }' WHERE Email = '{ email }'").ToList();
+                }
+            }
+        }
         public IActionResult Home()
         {
             if (User.Identity.IsAuthenticated)
@@ -95,10 +116,7 @@ namespace MyServiceStationProject.Controllers
             return View();
         }
 
-        public IActionResult SignUp()
-        {
-            return View();
-        }
+        public IActionResult SignUp() => View();
 
         [Authorize(Roles = "Admin")]
         public IActionResult OrdersList()
@@ -106,9 +124,10 @@ namespace MyServiceStationProject.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 string login = User.Claims.FirstOrDefault(c => c.Type == "username").Value;
-                var order = GetAllOrdersFromDb();
-                ViewData["order"] = order;
-                return View(order);
+                var orders = GetAllOrdersFromDb();
+                ViewData["order"] = orders;
+                List<Order> phoneGroups = orders.Select(x => x).OrderBy(x => x.Status).Reverse().ToList();
+                return View(phoneGroups);
             }
             return Redirect("/");
         }
@@ -143,17 +162,11 @@ namespace MyServiceStationProject.Controllers
                 check++;
                 return View("CreateOrder");
             }
-
         }
 
         [Authorize(Roles = "Admin")]
-        public IActionResult CreateOrder()
-        {
-            return View();
-        }
+        public IActionResult CreateOrder() => View();
 
-
-        //redacted
         [HttpPost("ManageOrder")]
         public IActionResult ManageOrder(string carNumber)
         {
@@ -161,9 +174,8 @@ namespace MyServiceStationProject.Controllers
             return View(order[0]);
         }
 
-        //redacted
         [HttpPost("UpdateOrder")]
-        public IActionResult UpdateOrder(int orderID, string carNumber, string brand, string model, string deadline, int price)
+        public IActionResult UpdateOrder(int orderID, string carNumber, string brand, string model, string deadline, int price, int status)
         {
             if (orderID != 0 && carNumber != null && brand != null && model != null && deadline != default && price != 0)
             {
@@ -203,7 +215,6 @@ namespace MyServiceStationProject.Controllers
             TempData["Error"] = "Error. Field can`t be empty!";
             return View("SignUp");
         }
-
 
         [HttpPost("login")]
         public async Task<IActionResult> Validate(string username, string password, string returnUrl)
@@ -280,7 +291,7 @@ namespace MyServiceStationProject.Controllers
             else
                 return new List<Client>();
         }
-       
+
         public List<Order> GetClientOrdersFromDb(string email)
         {
             if (User.Identity.IsAuthenticated)
@@ -349,7 +360,7 @@ namespace MyServiceStationProject.Controllers
                 return new List<Order>();
         }
 
-        public List<Worker> GetWorkerFromDb(string email) //add correct query
+        public List<Worker> GetWorkerFromDb(string email)
         {
             if (email != null)
             {
@@ -362,7 +373,8 @@ namespace MyServiceStationProject.Controllers
             else
                 return new List<Worker>();
         }
-        public Worker GetWorkerNameFromDb(int workerId) //add correct query
+
+        public Worker GetWorkerNameFromDb(int workerId)
         {
             if (workerId != 0)
             {
@@ -376,9 +388,7 @@ namespace MyServiceStationProject.Controllers
                 return new Worker();
         }
 
-
-        //redacted
-        public List<Order> GetCarFromDb(string carNumber) //add correct query
+        public List<Order> GetCarFromDb(string carNumber)
         {
             if (carNumber != null)
             {
@@ -392,17 +402,17 @@ namespace MyServiceStationProject.Controllers
                 return new List<Order>();
         }
 
-        public void UpdateCarInDB(int id, string carNumber, string brand, string model, string deadline, int price) //add correct query
+        public void UpdateCarInDB(int id, string carNumber, string brand, string model, string deadline, int price, string status)
         {
             if (carNumber != null)
             {
                 using (IDbConnection db = DbConnection)
                 {
-                    List<Order> order = db.Query<Order>($"UPDATE Orders SET CarNumber = '{ carNumber }', Brand = '{ brand }', Model = '{ model }', Deadline = '{ deadline }', Price = '{ (int)price }' WHERE ID = '{ id }'; ").ToList();
+                    List<Order> order = db.Query<Order>($"UPDATE Orders SET CarNumber = '{ carNumber }', Brand = '{ brand }', Model = '{ model }', Deadline = '{ deadline }', Price = '{ (int)price }', Status = '{ status }' WHERE ID = '{ id }'; ").ToList();
                 }
             }
         }
-
+      
         public void PutClientIntoDb(string firstName, string lastName, string phone, string email, string password)
         {
             using (IDbConnection db = DbConnection)

@@ -1,13 +1,12 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-
 @{
     var user = Model;
 }
+
 @if (User.Identity.IsAuthenticated)
 {
-
     <div class="text-center">
         <h1 class="display-4">Hey @user[0].FirstName @user[0].LastName </h1>
         <p>
@@ -24,7 +23,5 @@ else
         Wellcome on our site!
         Here you can find some information about new kind of Service Station
     </p>
-
-    <p>Fack You</p>
 </div>
 }

@@ -30,9 +30,11 @@
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">My Car</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="UserProfile">My Profile</a>
+                                </li>
                             }
-                        } 
-
+                        }
                         @if (!User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
@@ -42,7 +44,6 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="SignUp">Sign Up</a>
                             </li>
                         }
-
                         @if (User.Identity.IsAuthenticated)
                         {
 
@@ -53,6 +54,7 @@
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="OrdersList">Active Orders</a>
                                 </li>
                             }
+
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Logout">Logout</a>
                             </li>

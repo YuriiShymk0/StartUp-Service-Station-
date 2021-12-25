@@ -1,4 +1,3 @@
-
 @{
     ViewData["Title"] = "My Car";
     var item = Model;
@@ -10,20 +9,27 @@
     </div>
 }
 
-<div class="card col-lg-5 my-3 py-3 px-3 margin-card">
-    <tableRow>
-        <tr>
-            <td>
-                <form action="/UpdateOrder" method="post">
-                    <p><input type="hidden" name="orderID" value="@item.Id" /></p>
-                    <p class="">Car number :</p><input type="text" name="carNumber" value="@item.CarNumber" />
-                    <p class="">Brand of  car:</p><input type="text" name="brand" value="@item.Brand" />
-                    <p class="">Model of  car:</p><input type="text" name="model" value="@item.Model" />
-                    <p class="">Approximate time to issuence:</p><input type="text" name="deadline" value="@item.DeadLine" />
-                    <p class="">Approximate price:</p><input type="number" name="price" value="@item.Price" />
-                    <p><input type="submit" name="" value="UpdateOrder" /></p>
-                </form>
-            </td>
-        </tr>
-    </tableRow>
-</div>
+@using (Html.BeginForm("UpdateOrder", "Home", FormMethod.Post))
+{<div class="card col-lg-5 my-3 py-3 px-3 margin-card">
+        <tableRow>
+            <tr>
+                <td>
+                    <form action="/UpdateOrder" method="post">
+                        <p><input type="hidden" name="orderID" value="@item.Id" /></p>
+                        <p>Car number :</p><input type="text" name="carNumber" value="@item.CarNumber" />
+                        <p>Brand of  car:</p><input type="text" name="brand" value="@item.Brand" />
+                        <p>Model of  car:</p><input type="text" name="model" value="@item.Model" />
+                        <p>Approximate time to issuence:</p><input type="text" name="deadline" value="@item.DeadLine" />
+                        <p>Approximate price:</p><input type="number" name="price" value="@item.Price" />
+                        <p></p>    
+                        <p>
+                            Change status :
+                            @Html.DropDownList("Status", Html.GetEnumSelectList(typeof(MyServiceStation.Controllers.Status)))
+                        </p>
+                        <p><input type="submit" name="" value="UpdateOrder" /></p>
+                    </form>
+                </td>
+            </tr>
+        </tableRow>
+    </div>
+}

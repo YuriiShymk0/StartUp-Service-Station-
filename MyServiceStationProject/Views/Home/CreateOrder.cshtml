@@ -17,26 +17,14 @@
 <div class="text-center">
     <h1>Please enter the field to Add new Order</h1>
 
-    @*<form action="/addorder" method="post">
-        <p><input type="text" name="CarNumber" placeholder="CarNumber" /></p>
-        <p><input type="text" name="Brand" placeholder="Brand" /></p>
-        <p><input type="text" name="Model" placeholder="Model" /></p>
-        <p><input type="text" name="PhoneNumber" placeholder="Client phone number " /></p>
-
-        @Html.DropDownList("daytime", Html.GetEnumSelectList(typeof(MyServiceStation.Controllers.TimeOfDay)))
-        <p><input type="text" name="WorkerID" value="" /></p>
-        <p><input type="date" name="Deadline" placeholder="Deadline" /></p>
-        <p><input type="text" name="Price" placeholder="Price" /></p>
-        <p><input type="submit" value="CreateOrder" /></p>
-    </form>*@
-
+ 
     @using (Html.BeginForm("AddOrder", "Home", FormMethod.Post))
     {
         <p><input type="text" name="CarNumber" placeholder="CarNumber" /></p>
         <p><input type="text" name="Brand" placeholder="Brand" /></p>
         <p><input type="text" name="Model" placeholder="Model" /></p>
         <p><input type="text" name="PhoneNumber" placeholder="Client phone number " /></p>
-        <p> @Html.DropDownList("WorkerID", Html.GetEnumSelectList(typeof(MyServiceStation.Controllers.TimeOfDay)))</p>
+        <p> @Html.DropDownList("WorkerID", Html.GetEnumSelectList(typeof(MyServiceStation.Controllers.Workers)))</p>
         <p><input type="date" name="Deadline" placeholder="Deadline" /></p>
         <p><input type="text" name="Price" placeholder="Price" /></p>
         <p><input type="submit" value="CreateOrder" /></p>
