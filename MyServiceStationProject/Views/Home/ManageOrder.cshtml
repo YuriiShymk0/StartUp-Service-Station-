@@ -1,6 +1,12 @@
 @{
     ViewData["Title"] = "My Car";
     var item = Model;
+    var error = TempData["Error"] as string;
+}
+@if (!string.IsNullOrEmpty(error))
+{<div class="text-center">
+        <h2 class="alert-danger" style="padding:20px;">@error</h2>
+    </div>
 }
 
 @using (Html.BeginForm("UpdateOrder", "Home", FormMethod.Post))
