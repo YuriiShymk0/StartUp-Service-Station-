@@ -20,6 +20,9 @@ namespace MyServiceStationProject.Controllers
 {
     public class HomeController : Controller
     {
+
+        public string[] Statuses = { "Idle", "Done", "Ready", "In Work" };
+
         private readonly ILogger<HomeController> _logger;
 
         private readonly IConfiguration _configuration;
@@ -48,6 +51,30 @@ namespace MyServiceStationProject.Controllers
             return View();
         }
 
+        
+        public IActionResult UserProfile()
+        {
+            string login = User.Claims.FirstOrDefault(c => c.Type == "username").Value;
+            var client = GetClientFromDb(login);
+            return View(client[0]);
+        }
+
+        [HttpPost("ChangeUser")]
+        public IActionResult ChangeUser(string firstName, string lastName, string phone, string email, string password)
+        {
+            UpdateUser(firstName, lastName, phone, email, password);
+            return Redirect("/Home/UserProfile");
+        }
+        public void UpdateUser(string firstName, string lastName, string phone, string email, string password)
+        {
+            if (email != null)
+            {
+                using (IDbConnection db = DbConnection)
+                {
+                    List<Order> order = db.Query<Order>($"UPDATE Clients SET FirstName = '{firstName}', LastName = '{ lastName }', Phone = '{ phone }', Email = '{ email }', Password = '{ password }' WHERE Email = '{ email }'").ToList();
+                }
+            }
+        }
         public IActionResult Home()
         {
             if (User.Identity.IsAuthenticated)
@@ -97,9 +124,10 @@ namespace MyServiceStationProject.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 string login = User.Claims.FirstOrDefault(c => c.Type == "username").Value;
-                var order = GetAllOrdersFromDb();
-                ViewData["order"] = order;
-                return View(order);
+                var orders = GetAllOrdersFromDb();
+                ViewData["order"] = orders;
+                List<Order> phoneGroups = orders.Select(x => x).OrderBy(x => x.Status).Reverse().ToList();
+                return View(phoneGroups);
             }
             return Redirect("/");
         }
@@ -146,11 +174,10 @@ namespace MyServiceStationProject.Controllers
             return View(order[0]);
         }
 
-        //redacted
         [HttpPost("UpdateOrder")]
-        public IActionResult UpdateOrder(int orderID, string carNumber, string brand, string model, string deadline, int price)
+        public IActionResult UpdateOrder(int orderID, string carNumber, string brand, string model, string deadline, int price, int status)
         {
-            UpdateCarInDB(orderID, carNumber, brand, model, deadline, price);
+            UpdateCarInDB(orderID, carNumber, brand, model, deadline, price, Statuses[status]);
             return Redirect("/Home/OrdersList");
         }
 
@@ -183,7 +210,7 @@ namespace MyServiceStationProject.Controllers
             if (client.Count != 0)
             {
                 ViewData["ReturnUrl"] = returnUrl;
-                if (client[0].EMail == username || client[0].Phone == username && client[0].Password == password)
+                if ((client[0].EMail == username || client[0].Phone == username) && client[0].Password == password)
                 {
                     var claims = new List<Claim>();
                     claims.Add(new Claim("username", username));
@@ -231,8 +258,6 @@ namespace MyServiceStationProject.Controllers
             await HttpContext.SignOutAsync();
             return Redirect("/");
         }
-
-
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
@@ -283,7 +308,7 @@ namespace MyServiceStationProject.Controllers
                 return new List<Order>();
         }
 
-        public List<Worker> GetWorkerFromDb(string email) 
+        public List<Worker> GetWorkerFromDb(string email)
         {
             if (email != null)
             {
@@ -311,8 +336,6 @@ namespace MyServiceStationProject.Controllers
                 return new Worker();
         }
 
-
-        
         public List<Order> GetCarFromDb(string carNumber)
         {
             if (carNumber != null)
@@ -327,17 +350,17 @@ namespace MyServiceStationProject.Controllers
                 return new List<Order>();
         }
 
-        public void UpdateCarInDB(int id, string carNumber, string brand, string model, string deadline, int price) //add correct query
+        public void UpdateCarInDB(int id, string carNumber, string brand, string model, string deadline, int price, string status)
         {
             if (carNumber != null)
             {
                 using (IDbConnection db = DbConnection)
                 {
-                    List<Order> order = db.Query<Order>($"UPDATE Orders SET CarNumber = '{ carNumber }', Brand = '{ brand }', Model = '{ model }', Deadline = '{ deadline }', Price = '{ (int)price }' WHERE ID = '{ id }'; ").ToList();
+                    List<Order> order = db.Query<Order>($"UPDATE Orders SET CarNumber = '{ carNumber }', Brand = '{ brand }', Model = '{ model }', Deadline = '{ deadline }', Price = '{ (int)price }', Status = '{ status }' WHERE ID = '{ id }'; ").ToList();
                 }
             }
         }
-
+      
         public void PutClientIntoDb(string firstName, string lastName, string phone, string email, string password)
         {
             using (IDbConnection db = DbConnection)
