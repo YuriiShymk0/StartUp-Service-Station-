@@ -24,7 +24,7 @@
         <p><input type="text" name="Brand" placeholder="Brand" /></p>
         <p><input type="text" name="Model" placeholder="Model" /></p>
         <p><input type="text" name="PhoneNumber" placeholder="Client phone number " /></p>
-        <p> @Html.DropDownList("WorkerID", Html.GetEnumSelectList(typeof(MyServiceStation.Controllers.TimeOfDay)))</p>
+        <p> @Html.DropDownList("WorkerID", Html.GetEnumSelectList(typeof(MyServiceStation.Controllers.Workers)))</p>
         <p><input type="date" name="Deadline" placeholder="Deadline" /></p>
         <p><input type="text" name="Price" placeholder="Price" /></p>
         <p><input type="submit" value="CreateOrder" /></p>

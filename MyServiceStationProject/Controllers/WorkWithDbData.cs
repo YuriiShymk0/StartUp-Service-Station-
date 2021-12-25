@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace MyServiceStation.Controllers
 {
-    public enum TimeOfDay
+    public enum Workers
     {
         [Display(Name = "Andrew  Korochka")]
         Andrew = 30001,
@@ -16,6 +17,20 @@ namespace MyServiceStation.Controllers
         [Display(Name = "Чеснок  Вахукка")]
         Чеснок = 30007
     }
+
+    public enum Status
+    {
+        [Display(Name = "Idle")]
+        Idle,
+        [Display(Name = "Done")]
+        Done,
+        [Display(Name = "Ready")]
+        Ready,
+        [Display(Name = "In Work")]
+        InWork
+    }
+
+     
     public class Client
     {
         public int Id { get ; set; }

@@ -1,0 +1,21 @@
+﻿@{ViewData["Title"] = "My Car";
+    var item = Model;
+}
+
+<div class="card col-lg-5 my-3 py-3 px-3 margin-card">
+    <tableRow>
+        <tr>
+            <td>
+                <form action="/ChangeUser" method="post">
+                    <p>Name: <input type="text" name="firstName" value="@item.FirstName" /></p>
+                    <p>Surname: <input type="text" name="lastName" value="@item.LastName" /></p>
+                    <p>Email: <input type="email" name="email" value="@item.EMail" /></p>
+                    <p>Phone number: <input type="text" name="phone" value="@item.Phone" /></p>
+                    <p>Password: <input type="text" name="password" value="@item.Password" /></p>
+                    <p><input type="submit" name="" value="Save" /></p>
+                </form>
+            </td>
+        </tr>
+    </tableRow>
+</div>
+
