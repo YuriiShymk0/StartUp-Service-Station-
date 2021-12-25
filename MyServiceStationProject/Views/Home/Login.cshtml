@@ -12,8 +12,10 @@
 <div class="text-center">
     <h1>Login Page</h1>
     <form action="/login?ReturnUrl=@System.Net.WebUtility.UrlEncode(returnUrl)" method="post">
-        <p><input type="text" name="username" placeholder="Email or Phone number" /></p>
+        @*<p><button action="/login?ReturnUrl=@System.Net.WebUtility.UrlEncode(returnUrl)" formmethod="post" name="username" value="ddd@ddd.net"></button></p>*@
+        <p><input type="text"  name="username" placeholder="Email or phone" /></p>
         <p><input type="password" name="password" placeholder="Password" /></p>
+        @*<p><input type="submit" name="username" value="ddd@ddd.net" /></p>*@
         <div class="text-center">
             <p><input type="submit" value="login" /></p>
         </div>

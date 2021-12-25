@@ -1,4 +1,23 @@
-﻿@{
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "My Car"; var item = Model;
 }
 
-<span>Тут будет Эдип(едит)</span>
+<div class="card col-lg-5 my-3 py-3 px-3 margin-card">
+    <tableRow>
+        <tr>
+            <td>
+                <form action="/UpdateOrder" method="post">
+                    <p>Car number :</p><input type="text" name="carNumber" value="@item.CarNumber" />
+                    <p>Brand of  car:</p><input type="text" name="brand" value="@item.Brand" />
+                    <p>Model of  car:</p><input type="text" name="model" value="@item.Model" />
+                    <p>Approximate time to issuence:</p><input type="text" name="deadline" value="@item.DeadLine" />
+                    <p>Approximate price:</p><input type="number" name="price" value="@item.Price" />
+                    <p><input type="submit" value="UpdateOrder"/></p>
+                </form>
+            </td>
+        </tr>
+    </tableRow>
+</div>
