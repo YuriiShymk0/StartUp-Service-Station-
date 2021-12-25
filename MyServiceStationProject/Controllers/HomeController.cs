@@ -110,10 +110,20 @@ namespace MyServiceStationProject.Controllers
             return View();
         }
 
-        [Authorize(Roles = "Admin")]
-        public IActionResult ManageOrder()
+        //redacted
+        [HttpPost("ManageOrder")]
+        public IActionResult ManageOrder(string carNumber)
         {
-            return View();
+            var order = GetCarFromDb(carNumber);
+            return View(order[0]);
+        }
+
+        //redacted
+        [HttpPost("UpdateOrder")]
+        public IActionResult UpdateOrder(string carNumber, string brand, string model, string deadline, int price)
+        {
+            UpdateCarInDB(carNumber, brand, model, deadline, price);
+            return Redirect("/Home/OrdersList");
         }
 
         [HttpGet("login")]
@@ -192,8 +202,7 @@ namespace MyServiceStationProject.Controllers
             return Redirect("/");
         }
 
-
-
+        
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
@@ -254,6 +263,32 @@ namespace MyServiceStationProject.Controllers
             }
             else
                 return new List<Worker>();
+        }
+
+        //redacted
+        public List<Order> GetCarFromDb(string carNumber) //add correct query
+        {
+            if (carNumber != null)
+            {
+                using (IDbConnection db = DbConnection)
+                {
+                    List<Order> order = db.Query<Order>($"select * from Orders where CarNumber = '{ carNumber }' AND Status != 'Done'").ToList();
+                    return order.Count != 0 ? order : new List<Order>();
+                }
+            }
+            else
+                return new List<Order>();
+        }
+
+        public void UpdateCarInDB(string carNumber, string brand, string model, string deadline, int price) //add correct query
+        {
+            if (carNumber != null)
+            {
+                using (IDbConnection db = DbConnection)
+                {
+                    List<Order> order = db.Query<Order>($"UPDATE Orders SET CarNumber = '{ carNumber }', Brand = '{ brand }', Model = '{ model }', Deadline = '{ deadline }', Price = '{ (int)price }'; ").ToList();
+                }
+            }
         }
 
         public void PutClientIntoDb(string firstName, string lastName, string phone, string email, string password)

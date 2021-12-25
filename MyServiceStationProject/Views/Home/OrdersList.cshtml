@@ -1,17 +1,30 @@
 ﻿
 @{ ViewData["Title"] = "My Car"; var orders = Model; }
 
-<div class="text-center">
+<div class="text-center container">
     <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="ManageOrder">Edit</a>
     <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="CreateOrder">New Order</a>
 </div>
 
 @foreach (var item in orders)
 {
-    <div class="card col-lg-5 my-3 py-3 px-3 margin-card">
+
+
+<div class="card col-lg-5 my-3 py-3 px-3 margin-card">
         <tableRow>
             <tr>
                 <td>
+                    @*REDACTED*@
+                    @if(item.Status != "Done"){
+                        <form action="/ManageOrder" method="post">
+                            <button class="" formmethod="post" name="CarNumber" value="@item.CarNumber">Edit</button>
+                        </form>
+                     }else
+                        {
+                            <div class="alert-success">
+                                <h2>It's done</h2>
+                            </div>
+                        }
                     <p>Car number : @item.CarNumber </p>
                     <p>Brand of  car: @item.Brand
                     <p>Model of  car: @item.Model
