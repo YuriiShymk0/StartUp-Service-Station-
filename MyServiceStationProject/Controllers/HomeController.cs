@@ -21,18 +21,6 @@ namespace MyServiceStationProject.Controllers
 {
     public class HomeController : Controller
     {
-        public enum TimeOfDay
-        {
-            [Display(Name = "Утро")]
-            Morning,
-            [Display(Name = "День")]
-            Afternoon,
-            [Display(Name = "Вечер")]
-            Evening,
-            [Display(Name = "Ночь")]
-            Night
-        }
-
         private readonly ILogger<HomeController> _logger;
 
         private readonly IConfiguration _configuration;
@@ -85,18 +73,23 @@ namespace MyServiceStationProject.Controllers
             return View();
         }
 
-
         public IActionResult Privacy()
         {
             if (User.Identity.IsAuthenticated)
             {
                 string login = User.Claims.FirstOrDefault(c => c.Type == "username").Value;
                 var user = GetClientFromDb(login);
-                var order = GetClientOrderFromDb(user[0].EMail);
-                if (order != null)
+                var orders = GetClientOrdersFromDb(user[0].EMail);
+                List<Worker> workers = new List<Worker>();
+                foreach (var item in orders)
                 {
-                    ViewData["order"] = order;
-                    return View(order);
+                    workers.Add(GetWorkerNameFromDb(item.WorkerID));
+                }
+                if (orders != null)
+                {
+                    TempData["worker"] = workers;
+                    ViewData["order"] = orders;
+                    return View(orders);
                 }
             }
             return View();
@@ -121,21 +114,21 @@ namespace MyServiceStationProject.Controllers
         }
 
         [HttpPost("addorder")]
-        public IActionResult AddOrder(string CarNumber, string Brand, string Model, string PhoneNumber, int WorkerID, string Status, DateTime Deadline, int Price)
+        public IActionResult AddOrder(string CarNumber, string Brand, string Model, string PhoneNumber, int WorkerID, DateTime Deadline, int Price)
         {
             int check = 0 ;
-            if (CarNumber != null && Brand != null && Model != null && Status != null && Deadline != default && Price != 0)
+            if (CarNumber != null && Brand != null && Model != null &&  Deadline != default && Price != 0)
             {
                 var user = GetClientFromDb(PhoneNumber);
                 if (user.Count != 0)
                 {
-                    CreateNewOrder(CarNumber, Brand, Model, user[0].Id, WorkerID, Status, Deadline, Price);
+                    CreateNewOrder(CarNumber, Brand, Model, user[0].Id, WorkerID, "Idle", Deadline, Price);
                 }
                 else 
                 {
                     PutClientIntoDb("FirstName", "LastName", PhoneNumber, "email", "password");
                     var usr =GetClientFromDb(PhoneNumber);
-                    CreateNewOrder(CarNumber, Brand, Model, usr[0].Id, WorkerID, Status, Deadline, Price);
+                    CreateNewOrder(CarNumber, Brand, Model, usr[0].Id, WorkerID, "Idle", Deadline, Price);
                 }
                 TempData["Success"] = "Order was successuly created!";
                 return View("CreateOrder");
@@ -265,7 +258,7 @@ namespace MyServiceStationProject.Controllers
                 return new List<Client>();
         }
        
-        public List<Order> GetClientOrderFromDb(string email)
+        public List<Order> GetClientOrdersFromDb(string email)
         {
             if (User.Identity.IsAuthenticated)
             {
@@ -307,6 +300,20 @@ namespace MyServiceStationProject.Controllers
             else
                 return new List<Worker>();
         }
+        public Worker GetWorkerNameFromDb(int workerId) //add correct query
+        {
+            if (workerId != 0)
+            {
+                using (IDbConnection db = DbConnection)
+                {
+                    List<Worker> workers = db.Query<Worker>($"SELECT * FROM Workers WHERE ID = '{ workerId }' AND Admin = 'False'").ToList();
+                    return workers[0];
+                }
+            }
+            else
+                return new Worker();
+        }
+
 
         public void PutClientIntoDb(string firstName, string lastName, string phone, string email, string password)
         {
