@@ -1,8 +1,21 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace MyServiceStation.Controllers
 {
-
+    public enum TimeOfDay
+    {
+        [Display(Name = "Andrew  Korochka")]
+        Andrew = 30001,
+        [Display(Name = "Polina  Tyan")]
+        Polina = 30002,
+        [Display(Name = "Михайло  Хрущ")]
+        Михайло = 30003,
+        [Display(Name = "Дмитрий  Колено")]
+        Дмитрий = 30005,
+        [Display(Name = "Чеснок  Вахукка")]
+        Чеснок = 30007
+    }
     public class Client
     {
         public int Id { get ; set; }
