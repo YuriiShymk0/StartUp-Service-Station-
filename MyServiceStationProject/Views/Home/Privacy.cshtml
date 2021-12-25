@@ -16,7 +16,7 @@
         </div>
         for (int i = 0; i < orders.Count; i++)
         {
-            <div class="card col-lg-5 my-3 py-3 px-3 margin-card">
+            <div class="card col-lg-5 my-3 py-3 px-3 margin-card d-inline-block" style="max-width: 49%;">
                 <tableRow>
                     <tr>
                         <td>
@@ -27,7 +27,7 @@
                             <p>Order status: @orders[i].Status </p>
                             <p>Approximate price: @orders[i].Price$ </p>
                             <p></p>
-                            <p>Your worker :@workers[i].FirstName @workers[i].LastName </p>
+                            <p>Your worker: @workers[i].FirstName @workers[i].LastName </p>
                         </td>
                     </tr>
                 </tableRow>

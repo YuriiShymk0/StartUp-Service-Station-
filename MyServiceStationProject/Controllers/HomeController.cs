@@ -127,7 +127,19 @@ namespace MyServiceStationProject.Controllers
                 var orders = GetAllOrdersFromDb();
                 ViewData["order"] = orders;
                 List<Order> phoneGroups = orders.Select(x => x).OrderBy(x => x.Status).Reverse().ToList();
-                return View(phoneGroups);
+                List<Worker> workers = new List<Worker>();
+                foreach (var item in phoneGroups)
+                {
+                    workers.Add(GetWorkerNameFromDb(item.WorkerID));
+                }
+                if (orders != null)
+                {
+                    TempData["worker"] = workers;
+                    ViewData["order"] = phoneGroups;
+                    return View(phoneGroups);
+                }
+                TempData["worker"] = workers;
+                return View();
             }
             return Redirect("/");
         }
@@ -179,8 +191,9 @@ namespace MyServiceStationProject.Controllers
         {
             if (orderID != 0 && carNumber != null && brand != null && model != null && deadline != default && price != 0)
             {
-                UpdateCarInDB(orderID, carNumber, brand, model, deadline, price);
-                return Redirect("/Home/OrdersList");
+                    UpdateCarInDB(orderID, carNumber, brand, model, deadline, price, Statuses[status]);
+                    return Redirect("/Home/OrdersList");
+                
             }
             TempData["Error"] = "Error. Field can`t be empty!";
             var order = DbConnection.Query<Order>($"select * from Orders where ID = '{ orderID }' AND Status != 'Done'").ToList();
