@@ -1,4 +1,17 @@
 ﻿@{
+    var error = TempData["Error"] as string;
+    var success = TempData["Success"]  as string;
+}
+
+@if (error != null)
+{<div class="text-center">
+        <h2 class="alert-danger" style="padding:20px;">@error</h2>
+    </div>
+}
+@if (success != null)
+{<div class="text-center">
+        <h2 class="alert-success" style="padding:20px;">@success</h2>
+    </div>
 }
 
 <div class="text-center">
@@ -8,7 +21,7 @@
         <p><input type="text" name="CarNumber" placeholder="CarNumber" /></p>
         <p><input type="text" name="Brand" placeholder="Brand" /></p>
         <p><input type="text" name="Model" placeholder="Model" /></p>
-        <p><input type="text" name="ClientID" placeholder="ClientID" /></p>
+        <p><input type="text" name="PhoneNumber" placeholder="Client phone number " /></p>
         <p><input type="text" name="WorkerID" placeholder="WorkerID" /></p>
         <p><input type="text" name="Status" placeholder="Status" /></p>
         <p><input type="date" name="Deadline" placeholder="Deadline" /></p>

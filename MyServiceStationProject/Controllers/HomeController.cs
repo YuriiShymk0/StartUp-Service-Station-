@@ -10,6 +10,7 @@ using MyServiceStation.Controllers;
 using MyServiceStationProject.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
@@ -20,6 +21,18 @@ namespace MyServiceStationProject.Controllers
 {
     public class HomeController : Controller
     {
+        public enum TimeOfDay
+        {
+            [Display(Name = "Утро")]
+            Morning,
+            [Display(Name = "День")]
+            Afternoon,
+            [Display(Name = "Вечер")]
+            Evening,
+            [Display(Name = "Ночь")]
+            Night
+        }
+
         private readonly ILogger<HomeController> _logger;
 
         private readonly IConfiguration _configuration;
@@ -78,12 +91,15 @@ namespace MyServiceStationProject.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 string login = User.Claims.FirstOrDefault(c => c.Type == "username").Value;
-                var order = GetClientOrderFromDb(login);
-                ViewData["order"] = order;
-                return View(order);
+                var user = GetClientFromDb(login);
+                var order = GetClientOrderFromDb(user[0].EMail);
+                if (order != null)
+                {
+                    ViewData["order"] = order;
+                    return View(order);
+                }
             }
             return View();
-
         }
 
         public IActionResult SignUp()
@@ -103,23 +119,38 @@ namespace MyServiceStationProject.Controllers
             }
             return Redirect("/");
         }
-        //[Authorize(Roles = "Admin")]
-        //public IActionResult CreateOrder()
-        //{
-        //    return View();
-        //}
-
 
         [HttpPost("addorder")]
-        public IActionResult AddOrder(string CarNumber, string Brand, string Model, int ClientID, int WorkerID, string Status, DateTime Deadline, int Price)
+        public IActionResult AddOrder(string CarNumber, string Brand, string Model, string PhoneNumber, int WorkerID, string Status, DateTime Deadline, int Price)
         {
+            int check = 0 ;
             if (CarNumber != null && Brand != null && Model != null && Status != null && Deadline != default && Price != 0)
             {
-                CreateNewOrder(CarNumber, Brand, Model, ClientID, WorkerID, Status, Deadline, Price);
-                return Redirect("/Home/OrdersList");
+                var user = GetClientFromDb(PhoneNumber);
+                if (user.Count != 0)
+                {
+                    CreateNewOrder(CarNumber, Brand, Model, user[0].Id, WorkerID, Status, Deadline, Price);
+                }
+                else 
+                {
+                    PutClientIntoDb("FirstName", "LastName", PhoneNumber, "email", "password");
+                    var usr =GetClientFromDb(PhoneNumber);
+                    CreateNewOrder(CarNumber, Brand, Model, usr[0].Id, WorkerID, Status, Deadline, Price);
+                }
+                TempData["Success"] = "Order was successuly created!";
+                return View("CreateOrder");
             }
-            TempData["Error"] = "Error. Field can`t be empty!";
-            return View("/Home/CreateOrder");
+            else if(check == 0)
+            {
+                TempData["Error"] = "Error. Field can`t be empty!";
+                return View("CreateOrder");
+            }
+            else
+            {
+                 check++;
+                return View("CreateOrder");
+            }
+           
         }
 
         [Authorize(Roles = "Admin")]
@@ -233,8 +264,8 @@ namespace MyServiceStationProject.Controllers
             else
                 return new List<Client>();
         }
-
-        public List<Order> GetClientOrderFromDb(string email = "ddd@ddd.net")
+       
+        public List<Order> GetClientOrderFromDb(string email)
         {
             if (User.Identity.IsAuthenticated)
             {
@@ -248,6 +279,7 @@ namespace MyServiceStationProject.Controllers
             else
                 return new List<Order>();
         }
+
         public List<Order> GetAllOrdersFromDb()
         {
             if (User.Identity.IsAuthenticated)
