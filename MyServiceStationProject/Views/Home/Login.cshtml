@@ -1,8 +1,8 @@
-﻿
-@{
+﻿@{
     var returnUrl = ViewData["ReturnUrl"] as string;
     var error = TempData["Error"] as string;
 }
+
 @if (!string.IsNullOrEmpty(error))
 {<div class="text-center">
         <h2 class="alert-danger" style="padding:20px;">@error</h2>
@@ -12,10 +12,8 @@
 <div class="text-center">
     <h1>Login Page</h1>
     <form action="/login?ReturnUrl=@System.Net.WebUtility.UrlEncode(returnUrl)" method="post">
-        @*<p><button action="/login?ReturnUrl=@System.Net.WebUtility.UrlEncode(returnUrl)" formmethod="post" name="username" value="ddd@ddd.net"></button></p>*@
         <p><input type="text"  name="username" placeholder="Email or phone" /></p>
         <p><input type="password" name="password" placeholder="Password" /></p>
-        @*<p><input type="submit" name="username" value="ddd@ddd.net" /></p>*@
         <div class="text-center">
             <p><input type="submit" value="login" /></p>
         </div>

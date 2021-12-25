@@ -9,13 +9,10 @@
 
 @foreach (var item in orders)
 {
-
-
 <div class="card col-lg-5 my-3 py-3 px-3 margin-card">
         <tableRow>
             <tr>
                 <td>
-                    @*REDACTED*@
                     @if(item.Status != "Done"){
                         <form action="/ManageOrder" method="post">
                             <button class="" formmethod="post" name="CarNumber" value="@item.CarNumber">Edit</button>
