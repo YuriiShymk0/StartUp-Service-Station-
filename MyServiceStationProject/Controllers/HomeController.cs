@@ -116,34 +116,34 @@ namespace MyServiceStationProject.Controllers
         [HttpPost("addorder")]
         public IActionResult AddOrder(string CarNumber, string Brand, string Model, string PhoneNumber, int WorkerID, DateTime Deadline, int Price)
         {
-            int check = 0 ;
-            if (CarNumber != null && Brand != null && Model != null &&  Deadline != default && Price != 0)
+            int check = 0;
+            if (CarNumber != null && Brand != null && Model != null && Deadline != default && Price != 0)
             {
                 var user = GetClientFromDb(PhoneNumber);
                 if (user.Count != 0)
                 {
                     CreateNewOrder(CarNumber, Brand, Model, user[0].Id, WorkerID, "Idle", Deadline, Price);
                 }
-                else 
+                else
                 {
                     PutClientIntoDb("FirstName", "LastName", PhoneNumber, "email", "password");
-                    var usr =GetClientFromDb(PhoneNumber);
+                    var usr = GetClientFromDb(PhoneNumber);
                     CreateNewOrder(CarNumber, Brand, Model, usr[0].Id, WorkerID, "Idle", Deadline, Price);
                 }
                 TempData["Success"] = "Order was successuly created!";
                 return View("CreateOrder");
             }
-            else if(check == 0)
+            else if (check == 0)
             {
                 TempData["Error"] = "Error. Field can`t be empty!";
                 return View("CreateOrder");
             }
             else
             {
-                 check++;
+                check++;
                 return View("CreateOrder");
             }
-           
+
         }
 
         [Authorize(Roles = "Admin")]
@@ -173,6 +173,13 @@ namespace MyServiceStationProject.Controllers
             TempData["Error"] = "Error. Field can`t be empty!";
             var order = DbConnection.Query<Order>($"select * from Orders where ID = '{ orderID }' AND Status != 'Done'").ToList();
             return View("ManageOrder", order[0]);
+        }
+
+        [HttpPost("SearchResult")]
+        public IActionResult SearchResult(string adminQuery)
+        {
+            List<Order> searchResult = SearchingForOrders(adminQuery);
+            return View("OrdersList", searchResult);
         }
 
         [HttpGet("login")]
@@ -205,7 +212,7 @@ namespace MyServiceStationProject.Controllers
             if (client.Count != 0)
             {
                 ViewData["ReturnUrl"] = returnUrl;
-                if (client[0].EMail == username || client[0].Phone == username && client[0].Password == password)
+                if ((client[0].EMail == username || client[0].Phone == username) && client[0].Password == password)
                 {
                     var claims = new List<Claim>();
                     claims.Add(new Claim("username", username));
@@ -298,6 +305,45 @@ namespace MyServiceStationProject.Controllers
                     List<Order> order = db.Query<Order>($"select * from Orders ").ToList();
                     return order.Count != 0 ? order : new List<Order>();
                 }
+            }
+            else
+                return new List<Order>();
+        }
+
+        public List<Order> SearchingForOrders(string searchQuery)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                if(searchQuery != null)
+                {
+                    using (IDbConnection db = DbConnection)
+                    {
+                        List<Order> order = db.Query<Order>($"select * from Orders where CarNumber = '{ searchQuery }' OR Status = '{ searchQuery }' OR Brand = '{ searchQuery }' OR Model = '{ searchQuery }'").ToList();
+                        if (order.Count == 0)
+                        {
+                            List<Client> clientID = db.Query<Client>($"select ID from Clients where Phone = '{ searchQuery }' ").ToList();
+                            List<Order> postSearch = db.Query<Order>($"select * from Orders where ClientID = '{ clientID[0].Id }'").ToList();
+                            return postSearch.Count != 0 ? postSearch : new List<Order>();
+                            //List<Order> daClient = db.Query<Order>($"select * from Clients where Phone = '{ searchQuery }' OR FirstName = '{ searchQuery }' OR LastName = '{ searchQuery }' OR Model = '{ searchQuery }'").ToList();
+                            //int i = 0;
+                            //List<Order> filterArray = new List<Order>;
+                            //foreach (var item in daClient){
+                            //    List<Order> postOrders = db.Query<Order>($"select * from Orders where ClientID = '{ daClient[0].Id }'").ToList();
+                            //    var j = 0;
+                            //    foreach (var thing in postOrders) { 
+
+                            //        filterArray.Insert(0, postOrders[j]) = postOrders;
+                            //        j++;
+                            //    }
+                            //}
+                            //return filterArray;
+                            //order = db.Query<Order>($"select * from Orders where CarNumber = '{ searchQuery }' OR Status = '{ searchQuery }' OR Brand = '{ searchQuery }' OR Model = '{ searchQuery }'").ToList();
+                        }
+                        return order.Count != 0 ? order : new List<Order>();
+                    }
+                }
+                else
+                    return new List<Order>();
             }
             else
                 return new List<Order>();

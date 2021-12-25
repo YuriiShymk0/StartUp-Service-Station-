@@ -5,6 +5,16 @@
 <div class="text-center container shadow border border-secondary">
     <h1 class=""><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="CreateOrder">New Order</a></h1>
 </div>
+<div>
+    <form action="/SearchResult" method="post">
+        <div class="text-center " style="margin-top:20px">
+            <p>
+                <input type="text" name="adminQuery" placeholder="Enter the car number or Client's phone" class="navbar-text " style="width: 500px"/>
+                <input class="rounded" type="submit" name="search" value="Go" />
+            </p>
+        </div>
+    </form>
+</div>
 
 @foreach (var item in orders)
 {
