@@ -2,6 +2,7 @@
 @{ ViewData["Title"] = "My Car";
     var Orders = Model;
     var workers = TempData["worker"] as List<MyServiceStation.Controllers.Worker>;
+    var error = TempData["Error"] as string;
 }
 
 <div class="text-center container shadow border border-secondary">
@@ -18,35 +19,46 @@
     </form>
 </div>
 
-@for (int i = 0; i < Orders.Count; i++)
+@if (!string.IsNullOrEmpty(error))
+{<div class="text-center">
+        <h2 class="alert-danger" style="padding:20px;">@error</h2>
+    </div>
+}
+@if (Orders.Count != 0)
 {
-    <div class="card col-lg-5 my-3 py-3 px-3 margin-card d-inline-block" style="max-width: 49%;">
-    <tableRow>
-        <tr>
-            <td>
-                @if (Orders[i].Status != "Done")
-                {
-                    <form action="/ManageOrder" method="post">
-                        <div class="container justify-content-center text-center">
-                            <p class=""><button class="container-fluid" formmethod="post" name="CarNumber" value="@Orders[i].CarNumber">Edit</button></p>
-                        </div>
-                    </form>
-                }
-                else
-                {
-                    <div class="alert-success text-center">
-                        <h3>It's done</h3>
-                    </div>
-                }
-                <p>Car number : @Orders[i].CarNumber </p>
-                <p>Brand of  car: @Orders[i].Brand
-                <p>Model of  car: @Orders[i].Model
-                <p>Approximate time to issuence: @Orders[i].DeadLine </p>
-                <p>Worker: @workers[i].FirstName @workers[i].LastName</p>
-                <p>Order status: @Orders[i].Status </p>
-                <p>Approximate price: @Orders[i].Price$ </p>
-            </td>
-        </tr>
-    </tableRow>
-</div>
+    @for (int i = 0; i < Orders.Count; i++)
+    {
+        <div class="card col-lg-5 my-3 py-3 px-3 margin-card d-inline-block" style="max-width: 49%;">
+            <tableRow>
+                <tr>
+                    <td>
+                        @if (Orders[i].Status != "Done")
+                        {
+                            <form action="/ManageOrder" method="post">
+                                <div class="container justify-content-center text-center">
+                                    <p class=""><button class="container-fluid" formmethod="post" name="CarNumber" value="@Orders[i].CarNumber">Edit</button></p>
+                                </div>
+                            </form>
+                        }
+                        else
+                        {
+                            <div class="alert-success text-center">
+                                <h3>It's done</h3>
+                            </div>
+                        }
+                        <p>Car number : @Orders[i].CarNumber </p>
+                        <p>Brand of  car: @Orders[i].Brand
+                        <p>Model of  car: @Orders[i].Model
+                        <p>Approximate time to issuence: @Orders[i].DeadLine </p>
+                        @if (workers != null)
+                        {
+                        <p>Worker: @workers[i].FirstName @workers[i].LastName</p>
+                        }
+                        <p>Order status: @Orders[i].Status </p>
+                        <p>Approximate price: @Orders[i].Price$ </p>
+                    </td>
+                </tr>
+            </tableRow>
+        </div>
+    }
 }
